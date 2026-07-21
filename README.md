@@ -37,19 +37,13 @@ Before you begin, ensure you have met the following requirements:
     cd EBay_Admin
     ```
 
-2.  **Navigate to the Backend Directory:**
+2.  **Install Dependencies:**
 
     ```bash
-    cd backend
+    npm run install:all
     ```
 
-3.  **Install Dependencies:**
-
-    ```bash
-    npm install  # or yarn install
-    ```
-
-4.  **Configure Environment Variables:**
+3.  **Configure Environment Variables:**
 
     Create a `.env` file in the `backend` directory and populate it with the necessary environment variables (see Configuration Options).  Example variables (replace with your actual values):
 
@@ -82,7 +76,7 @@ Before you begin, ensure you have met the following requirements:
     BANK_ACCOUNT_NAME=***
     ```
 
-5.  **Start the Server:**
+4.  **Start the Server:**
 
     ```bash
     npm run dev # For development with nodemon
@@ -90,8 +84,14 @@ Before you begin, ensure you have met the following requirements:
     npm start # For production
     ```
 
-6.  **Database Setup:**
+5.  **Database Setup and Seeding Data:**
     Ensure MongoDB is running and accessible at the specified `MONGODB_URI`.  You may need to create the database (`ebay_admin` in the example above) manually.
+
+    After that, run this command to seeding data for db:
+
+    ```bash
+    node db/seed.js
+    ```
 
 ## Usage Examples & API Documentation
 
