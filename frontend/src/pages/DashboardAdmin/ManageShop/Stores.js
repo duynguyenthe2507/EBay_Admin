@@ -5,8 +5,6 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Pagination from "@mui/material/Pagination";
-import Stack from "@mui/material/Stack";
-import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import Tooltip from "@mui/material/Tooltip";
@@ -20,12 +18,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  FormControlLabel,
-  FormGroup,
   IconButton,
   Paper,
-  Radio,
-  RadioGroup,
   Snackbar,
   TableContainer,
   TextField,
@@ -67,9 +61,8 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
         `http://localhost:9999/api/admin/stores/${deletingStore._id}`,
         {
           headers: {
-            Authorization: `Bearer ${
-              localStorage.getItem("accessToken") || ""
-            }`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken") || ""
+              }`,
           },
         }
       );
@@ -89,9 +82,8 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
       console.error("Delete error:", error.response || error);
       setSnackbar({
         open: true,
-        msg: `Lỗi khi xóa cửa hàng! ${
-          error.response?.data?.message || error.message
-        }`,
+        msg: `Lỗi khi xóa cửa hàng! ${error.response?.data?.message || error.message
+          }`,
         severity: "error",
       });
       setDeletingStore(null);
@@ -204,9 +196,9 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
         open={Boolean(deletingStore)}
         onClose={() => setDeletingStore(null)}
         PaperProps={{
-          sx: { 
+          sx: {
             borderRadius: 2,
-            boxShadow: "0 8px 24px rgba(0,0,0,0.12)" 
+            boxShadow: "0 8px 24px rgba(0,0,0,0.12)"
           }
         }}
       >
@@ -223,19 +215,19 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button 
-            onClick={() => setDeletingStore(null)} 
-            color="inherit" 
+          <Button
+            onClick={() => setDeletingStore(null)}
+            color="inherit"
             variant="outlined"
             sx={{ borderRadius: 2 }}
           >
             Huỷ
           </Button>
-          <Button 
-            onClick={handleDeleteStore} 
-            color="error" 
+          <Button
+            onClick={handleDeleteStore}
+            color="error"
             variant="contained"
-            sx={{ 
+            sx={{
               borderRadius: 2,
               boxShadow: "none",
               '&:hover': {
@@ -247,14 +239,14 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       <Snackbar
         open={snackbar.open}
         autoHideDuration={2500}
         onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert 
+        <Alert
           severity={snackbar.severity}
           variant="filled"
           sx={{ borderRadius: 2 }}
@@ -271,8 +263,8 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
           minHeight: "80vh",
         }}
       >
-        <Box 
-          display="flex" 
+        <Box
+          display="flex"
           alignItems="center"
           mb={3}
           p={1}
@@ -286,7 +278,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
             {filteredStores.length} stores found
           </Typography>
         </Box>
-        
+
         <Grid container spacing={3}>
           <Grid item xs={12} md={3}>
             <Card
@@ -320,25 +312,25 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
                   </Typography>
                   {(selectedStatuses.length > 0 ||
                     selectedRatingRanges.length > 0) && (
-                    <Tooltip title="Clear all">
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          setSelectedStatuses([]);
-                          setSelectedRatingRanges([]);
-                          setKeywords("");
-                        }}
-                        sx={{ 
-                          bgcolor: 'rgba(0,0,0,0.04)',
-                          '&:hover': {
-                            bgcolor: 'rgba(0,0,0,0.08)'
-                          }
-                        }}
-                      >
-                        <ClearAllIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
+                      <Tooltip title="Clear all">
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setSelectedStatuses([]);
+                            setSelectedRatingRanges([]);
+                            setKeywords("");
+                          }}
+                          sx={{
+                            bgcolor: 'rgba(0,0,0,0.04)',
+                            '&:hover': {
+                              bgcolor: 'rgba(0,0,0,0.08)'
+                            }
+                          }}
+                        >
+                          <ClearAllIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                 </Box>
 
                 {/* Search */}
@@ -350,7 +342,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
                     fullWidth
                     label="Search stores"
                     placeholder="Enter store name or seller"
-                    InputProps={{ 
+                    InputProps={{
                       endAdornment: <SearchIcon color="action" />,
                       sx: {
                         borderRadius: 2,
@@ -418,7 +410,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
                     }}
                   >
                     {ratingRanges.map((range) => (
-                      <Box 
+                      <Box
                         key={range.label}
                         onClick={() => handleRatingRangeChange(range.label)}
                         sx={{
@@ -460,7 +452,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
               </CardContent>
             </Card>
           </Grid>
-          
+
           <Grid item xs={12} md={9}>
             <TableContainer
               component={Paper}
@@ -517,15 +509,15 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
                       <TableCell>{store.sellerId?.username || "N/A"}</TableCell>
                       <TableCell>{store.sellerId?.email}</TableCell>
                       <TableCell>
-                        <Chip 
-                          label={store.status} 
+                        <Chip
+                          label={store.status}
                           size="small"
-                          sx={{ 
+                          sx={{
                             bgcolor: `${getStatusColor(store.status)}20`,
                             color: getStatusColor(store.status),
                             fontWeight: 500,
                             borderRadius: 1
-                          }} 
+                          }}
                         />
                       </TableCell>
                       <TableCell>
@@ -552,7 +544,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
                                 color="primary"
                                 onClick={() => setEditingStore(store)}
                                 size="small"
-                                sx={{ 
+                                sx={{
                                   bgcolor: 'rgba(25,118,210,0.08)',
                                   mr: 1,
                                   '&:hover': {
@@ -570,7 +562,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
                                 color="error"
                                 onClick={() => setDeletingStore(store)}
                                 size="small"
-                                sx={{ 
+                                sx={{
                                   bgcolor: 'rgba(244,67,54,0.08)',
                                   '&:hover': {
                                     bgcolor: 'rgba(244,67,54,0.15)'
@@ -600,7 +592,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
                 </TableBody>
               </Table>
             </TableContainer>
-            
+
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
               <Pagination
                 page={currentPage}
@@ -611,7 +603,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
                 shape="rounded"
                 showFirstButton
                 showLastButton
-                sx={{ 
+                sx={{
                   '& .MuiPaginationItem-root': {
                     borderRadius: 1,
                     mx: 0.2

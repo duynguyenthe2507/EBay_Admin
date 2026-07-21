@@ -67,6 +67,7 @@ import LockedAccount from "./pages/LockedAccount";
 import PendingAccount from "./pages/PendingAccount";
 import ManageReviews from "./pages/DashboardAdmin/ManageReview/ManageReviews";
 import ManageDisputes from "./pages/DashboardAdmin/ManageDispute/ManageDisputes";
+import SendEmail from "./pages/DashboardAdmin/ManageUser/SendEmail";
 
 
 const Layout = () => {
@@ -175,6 +176,13 @@ const router = createBrowserRouter(
         <Route path="/admin/manage-disputes" element={
           <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT, ROLES.MONITOR]}>
             <ManageDisputes />
+          </ProtectedRoute>
+        }></Route>
+
+        {/* Send Email - Admin & Support */}
+        <Route path="/admin/send-email" element={
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT]}>
+            <SendEmail />
           </ProtectedRoute>
         }></Route>
       </Route>

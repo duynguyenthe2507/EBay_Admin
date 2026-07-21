@@ -68,6 +68,9 @@ const {
   getAdminReport,
   createAdminUser,
   updateUserRole,
+
+  // Email
+  sendAdminEmail,
 } = require("../controllers/adminController");
 
 const {
@@ -124,6 +127,9 @@ router.get('/seller-feedbacks', authorize(PERMISSIONS.MANAGE_REVIEWS), getAllSel
 
 // --- Admin Dashboard Routes ---
 router.get("/report", authorize(PERMISSIONS.VIEW_REPORTS), getAdminReport);
+
+// --- Email Routes ---
+router.post('/send-email', sendAdminEmail);
 
 // Voucher Management Routes
 router.post('/vouchers', authorize(PERMISSIONS.MANAGE_VOUCHERS), createVoucher);
