@@ -143,23 +143,23 @@ const router = createBrowserRouter(
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Stores - Admin & Finance only */}
+        {/* Manage Stores - Admin & Support only */}
         <Route path="/admin/manage-stores" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.FINANCE]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT]}>
             <ManageStore />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Vouchers - Admin & Support & Finance */}
+        {/* Manage Vouchers - Admin & Finance */}
         <Route path="/admin/manage-vouchers" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT, ROLES.FINANCE]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.FINANCE]}>
             <ManageVoucher />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Orders - Admin only */}
+        {/* Manage Orders - Admin & Finance */}
         <Route path="/admin/manage-orders" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.FINANCE]}>
             <ManageOrderAdmin />
           </ProtectedRoute>
         }></Route>

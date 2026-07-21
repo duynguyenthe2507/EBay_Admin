@@ -117,9 +117,9 @@ router.get("/orders/:orderId", authorize(PERMISSIONS.MANAGE_ORDERS), getOrderDet
 router.put("/orders/:orderId/status", authorize(PERMISSIONS.MANAGE_ORDERS), updateOrderStatusAdmin);
 
 // --- Review and Feedback Moderation Routes ---
-router.get("/reviews", authorize(PERMISSIONS.MANAGE_PRODUCTS), getAllReviewsAdmin);
-router.delete("/reviews/:id", authorize(PERMISSIONS.MANAGE_PRODUCTS), deleteReviewAdmin);
-router.get('/seller-feedbacks', authorize(PERMISSIONS.MANAGE_PRODUCTS), getAllSellerFeedbackAdmin);
+router.get("/reviews", authorize(PERMISSIONS.MANAGE_REVIEWS), getAllReviewsAdmin);
+router.delete("/reviews/:id", authorize(PERMISSIONS.MANAGE_REVIEWS), deleteReviewAdmin);
+router.get('/seller-feedbacks', authorize(PERMISSIONS.MANAGE_REVIEWS), getAllSellerFeedbackAdmin);
 
 // --- Admin Dashboard Routes ---
 router.get("/report", authorize(PERMISSIONS.VIEW_REPORTS), getAdminReport);

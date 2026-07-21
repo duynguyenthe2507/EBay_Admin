@@ -365,8 +365,8 @@ export default function AdminDashboardLayout() {
                 </ListItemButton>
               )}
 
-              {/* Manage Reviews - Admin only */}
-              {canAccess(['admin']) && (
+              {/* Manage Reviews - Admin & Support */}
+              {canAccess(['admin', 'support']) && (
                 <ListItemButton
                   onClick={() => navigate("/admin/manage-reviews")}
                   selected={currentPath === "/admin/manage-reviews"}
@@ -419,8 +419,8 @@ export default function AdminDashboardLayout() {
                 </ListItemButton>
               )}
 
-              {/* Manage Orders - Admin only */}
-              {canAccess(['admin']) && (
+              {/* Manage Orders - Admin & Finance */}
+              {canAccess(['admin', 'finance']) && (
                 <ListItemButton
                   onClick={handleOnclickOrders}
                   selected={currentPath === "/admin/manage-orders"}
