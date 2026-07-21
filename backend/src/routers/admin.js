@@ -8,6 +8,7 @@ const {
   isAdmin,
 } = require("../middleware/auth.middleware");
 const adminAccessGuard = require('../middleware/adminAccessGuard');
+const monitorGuard = require('../middleware/monitorGuard');
 
 // Import các controller functions từ adminController
 const {
@@ -83,7 +84,7 @@ const { authorize, PERMISSIONS, ADMIN_ROLES } = require('../middleware/rbac');
 router.use(authMiddleware);
 router.use(authorizeRoles(...ADMIN_ROLES));
 router.use(adminAccessGuard);
-
+router.use(monitorGuard); // monitor role: read-only, block POST/PUT/PATCH/DELETE
 // --- User Management Routes ---
 router.get("/users", authorize(PERMISSIONS.MANAGE_USERS), getAllUsers);
 router.get("/users/:userId", authorize(PERMISSIONS.MANAGE_USERS), getUserDetails);

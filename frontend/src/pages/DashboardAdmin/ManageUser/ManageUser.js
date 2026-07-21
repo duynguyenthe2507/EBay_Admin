@@ -6,7 +6,7 @@ import { useOutletContext } from "react-router-dom";
 import axios from "axios";
 
 export default function ManageUser() {
-  const { handleSetDashboardTitle } = useOutletContext();
+  const { handleSetDashboardTitle, isMonitor } = useOutletContext();
   const [users, setUsers] = React.useState([]);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [totalPages, setTotalPages] = React.useState(1);
@@ -87,6 +87,7 @@ export default function ManageUser() {
             totalUsers={totalUsers}
             onPageChange={handlePageChange}
             filters={filters}
+            isMonitor={isMonitor}
             onFiltersChange={handleFiltersChange}
           />
         </Paper>

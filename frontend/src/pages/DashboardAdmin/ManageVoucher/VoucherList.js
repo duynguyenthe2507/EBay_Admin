@@ -43,7 +43,7 @@ import VoucherForm from './VoucherForm';
 import VoucherService from './VoucherService';
 import Title from '../Title';
 
-const VoucherList = () => {
+const VoucherList = ({ isMonitor = false }) => {
   const [vouchers, setVouchers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -282,14 +282,16 @@ const VoucherList = () => {
                 )
               }}
             />
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<AddIcon />}
-              onClick={() => handleOpenForm()}
-            >
-              Add Voucher
-            </Button>
+            {!isMonitor && (
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AddIcon />}
+                onClick={() => handleOpenForm()}
+              >
+                Add Voucher
+              </Button>
+            )}
           </Box>
 
           {loading && <LinearProgress sx={{ mb: 2 }} />}
@@ -310,7 +312,7 @@ const VoucherList = () => {
                     <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Expiration</TableCell>
                     <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="center">Usage</TableCell>
                     <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="center">Status</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="center">Actions</TableCell>
+                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="center">{isMonitor ? 'View' : 'Actions'}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -366,12 +368,16 @@ const VoucherList = () => {
                         />
                       </TableCell>
                       <TableCell align="center">
-                        <IconButton
-                          size="small"
-                          onClick={(event) => handleOpenActionMenu(event, voucher)}
-                        >
-                          <MoreVertIcon fontSize="small" />
-                        </IconButton>
+                        {!isMonitor ? (
+                          <IconButton
+                            size="small"
+                            onClick={(event) => handleOpenActionMenu(event, voucher)}
+                          >
+                            <MoreVertIcon fontSize="small" />
+                          </IconButton>
+                        ) : (
+                          <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>View only</Typography>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
