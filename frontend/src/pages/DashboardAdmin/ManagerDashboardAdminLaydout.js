@@ -151,7 +151,7 @@ export default function AdminDashboardLayout() {
     // Gọi song song hai API
     const fetchData = async () => {
       try {
-        const [reportRes, profileRes] = await Promise.all([
+        const [reportRes, profileRes] = await Promise.allSettled([
           axios.get("http://localhost:9999/api/admin/report", {
             headers: { Authorization: `Bearer ${token}` },
           }),
@@ -161,13 +161,13 @@ export default function AdminDashboardLayout() {
         ]);
 
         // Xử lý admin/report
-        if (!reportRes.data.success) {
+        if (reportRes.status === 'fulfilled' && !reportRes.value.data.success) {
           console.warn("Không lấy được báo cáo admin");
         }
 
         // Xử lý profile
-        if (profileRes.data.success && profileRes.data.data) {
-          const profile = profileRes.data.data;
+        if (profileRes.status === 'fulfilled' && profileRes.value.data.success && profileRes.value.data.data) {
+          const profile = profileRes.value.data.data;
           setAdminInfo({
             avatarURL: profile.avatarURL,
             username: profile.username,
