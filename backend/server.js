@@ -115,6 +115,7 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running at PORT ${PORT}`);
   console.log(`WebSocket server is running`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log('System is running with admin account sysadmin@gmail.com/123456');
 
   // Initialize schedulers after server starts
   initScheduler();
