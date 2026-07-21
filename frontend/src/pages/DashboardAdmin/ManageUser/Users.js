@@ -21,7 +21,6 @@ import {
   DialogContentText,
   DialogTitle,
   FormControlLabel,
-  FormGroup,
   IconButton,
   Paper,
   Radio,
@@ -58,7 +57,6 @@ import LockOpenIcon from "@mui/icons-material/LockOpen";
 import BlockIcon from "@mui/icons-material/Block";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import PendingIcon from "@mui/icons-material/Pending";
 import EmailIcon from "@mui/icons-material/Email";
 import Title from "../Title";
 

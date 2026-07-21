@@ -1,15 +1,13 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Box, Button, Card, CardContent, Chip, CircularProgress,
   Divider, FormControlLabel, Grid, IconButton, InputAdornment,
-  MenuItem, Paper, Radio, RadioGroup, Snackbar, Alert,
+  Paper, Radio, RadioGroup, Snackbar, Alert,
   TextField, Tooltip, Typography, Avatar, List, ListItem,
-  ListItemAvatar, ListItemText, ListItemSecondaryAction,
-  FormLabel, FormControl,
+  ListItemAvatar, ListItemText, FormControl
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Title from '../Title';
 
 // Icons
 import SendIcon from '@mui/icons-material/Send';
@@ -17,7 +15,6 @@ import ScheduleSendIcon from '@mui/icons-material/ScheduleSend';
 import GroupIcon from '@mui/icons-material/Group';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
-import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SearchIcon from '@mui/icons-material/Search';
 import EmailIcon from '@mui/icons-material/Email';
@@ -35,8 +32,8 @@ const RECIPIENT_OPTIONS = [
   },
   {
     value: 'admins',
-    label: 'All Admins',
-    description: 'Send to all users with admin role',
+    label: 'All Admin-level Users',
+    description: 'Send to all admin, monitor, support & finance roles',
     icon: <AdminPanelSettingsIcon />,
     color: '#8b5cf6',
   },

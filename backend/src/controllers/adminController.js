@@ -1946,7 +1946,7 @@ exports.sendAdminEmail = async (req, res) => {
       const users = await User.find({}, 'email').lean();
       emails = users.map(u => u.email).filter(Boolean);
     } else if (recipients.type === 'admins') {
-      const admins = await User.find({ role: 'admin' }, 'email').lean();
+      const admins = await User.find({ role: { $in: ['admin', 'monitor', 'support', 'finance'] } }, 'email').lean();
       emails = admins.map(u => u.email).filter(Boolean);
     } else if (recipients.type === 'specific') {
       emails = (recipients.emails || []).filter(Boolean);
