@@ -47,6 +47,7 @@ import CheckBoxIcon from "@mui/icons-material/CheckBox";
 export default function Products({
   products: initialProducts,
   onProductUpdated,
+  isMonitor = false,
 }) {
   const [deletingProduct, setDeletingProduct] = React.useState(null);
   const [editingProduct, setEditingProduct] = React.useState(null);
@@ -621,24 +622,28 @@ export default function Products({
                       ({product.totalReviews || 0} reviews)
                     </TableCell>
                     <TableCell>
-                      <Tooltip title="Update">
-                        <IconButton
-                          color="primary"
-                          style={{ marginRight: 8 }}
-                          onClick={() => setEditingProduct(product)}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete">
-                        <IconButton
-                          color="error"
-                          style={{ marginRight: 8 }}
-                          onClick={() => setDeletingProduct(product)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
+                      {!isMonitor && (
+                        <Tooltip title="Update">
+                          <IconButton
+                            color="primary"
+                            style={{ marginRight: 8 }}
+                            onClick={() => setEditingProduct(product)}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      {!isMonitor && (
+                        <Tooltip title="Delete">
+                          <IconButton
+                            color="error"
+                            style={{ marginRight: 8 }}
+                            onClick={() => setDeletingProduct(product)}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                       <Tooltip title="View Reviews">
                         <IconButton
                           color="info"
