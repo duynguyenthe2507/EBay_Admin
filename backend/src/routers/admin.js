@@ -68,6 +68,9 @@ const {
   getAdminReport,
   createAdminUser,
   updateUserRole,
+
+  // Email
+  sendAdminEmail,
 } = require("../controllers/adminController");
 
 const {
@@ -130,6 +133,9 @@ router.get('/seller-feedbacks', getAllSellerFeedbackAdmin); // danh sách feedba
 
 // --- Admin Dashboard Routes ---
 router.get("/report", getAdminReport);
+
+// --- Email Routes ---
+router.post('/send-email', sendAdminEmail);
 
 // Voucher Management Routes
 router.post('/vouchers', createVoucher);
