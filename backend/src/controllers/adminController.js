@@ -16,6 +16,7 @@ const {
   Payment,
   ReturnRequest,
   ShippingInfo,
+  Voucher,
 } = require("../models");
 const { sendEmail } = require("../utils/email");
 const logger = require("../utils/logger");
@@ -1465,6 +1466,8 @@ exports.getAdminReport = async (req, res) => {
       recentActivity,
       activeSellers,
       activeBuyers,
+      usersOverTime,
+      vouchersActive,
     ] = await Promise.all([
       // Order status stats
       Order.aggregate([
@@ -1745,6 +1748,20 @@ exports.getAdminReport = async (req, res) => {
       // Đếm active seller và buyer từ danh sách ID
       User.countDocuments({ role: "seller", _id: { $in: activeSellerIds } }),
       User.countDocuments({ role: "buyer", _id: { $in: activeBuyerIds } }),
+      // Thống kê lượng người dùng đăng ký theo thời gian
+      User.aggregate([
+        { $match: dateFilter },
+        {
+          $group: {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+        { $project: { date: "$_id", count: 1, _id: 0 } },
+      ]),
+      // Thống kê số lượng voucher đang hoạt động
+      Voucher.countDocuments({ ...dateFilter, isActive: true }),
     ]);
 
     const orderStatus = {
@@ -1795,11 +1812,15 @@ exports.getAdminReport = async (req, res) => {
       trends: {
         revenueOverTime,
         orderOverTime,
+        usersOverTime,
       },
       insights: {
         revenueByCategory,
         topProducts,
         productsByCategory,
+      },
+      vouchers: {
+        active: vouchersActive,
       },
       activities: {
         recentActivity,
