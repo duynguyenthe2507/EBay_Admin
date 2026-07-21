@@ -21,6 +21,8 @@ const { sendEmail } = require("../utils/email");
 const logger = require("../utils/logger");
 const mongoose = require("mongoose");
 
+const AuditLog = require("../models/AuditLog");
+
 // --- Hàm Hỗ Trợ Xử Lý Lỗi (Helper Function for Error Responses) ---
 // Hàm này giúp chuẩn hóa việc xử lý và phản hồi lỗi.
 const handleError = (res, error, message = "Lỗi Máy Chủ", statusCode = 500) => {
@@ -172,6 +174,18 @@ exports.deleteUserByAdmin = async (req, res) => {
         .json({ success: false, message: "Người dùng không tồn tại" });
     }
     await User.findByIdAndDelete(userId);
+
+    // Ghi Audit Log
+    await createAuditLog({
+      admin: req.user.id,
+      action: "DELETE_USER",
+      targetType: "USER",
+      targetId: user._id,
+      description: `Delete user ${user.email}`,
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
+
     res
       .status(200)
       .json({ success: true, message: "Xóa người dùng thành công" });
@@ -262,56 +276,81 @@ exports.approveUser = async (req, res) => {
  * @access Riêng tư (Admin)
  */
 exports.updateUserByAdmin = async (req, res) => {
+  const { createAuditLog } = require("../services/auditLogService");
   const { userId } = req.params;
   const { role, action, username, email } = req.body;
 
   try {
     const user = await User.findById(userId);
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Người dùng không tồn tại" });
+      return res.status(404).json({
+        success: false,
+        message: "Người dùng không tồn tại",
+      });
     }
 
-    const previousAction = user.action; // Lưu trạng thái trước để kiểm tra thay đổi
+    const previousAction = user.action;
+    
+    // Mặc định nếu chỉ sửa username, email, role... thì log là USER_UPDATE
+    let auditAction = "USER_UPDATE";
+    let auditDescription = `Cập nhật thông tin người dùng ${user.username}`;
 
     if (username) user.username = username;
     if (email) user.email = email;
     if (role && ["buyer", "seller", "admin"].includes(role)) {
       user.role = role;
     }
+
+    // Xử lý khi có gửi field `action`
     if (action && ["lock", "unlock"].includes(action)) {
       user.action = action;
-      // Nếu lock seller, reject store nếu tồn tại
-      if (action === "lock" && user.role === "seller") {
-        const store = await Store.findOne({ sellerId: user._id });
-        if (store) {
-          store.status = "rejected";
-          await store.save();
-          // Gửi email thông báo store bị rejected
-          await sendEmail(
-            user.email,
-            "Cửa hàng của bạn đã bị từ chối",
-            `Kính gửi ${user.username},\n\nCửa hàng của bạn (${store.storeName}) đã bị từ chối do tài khoản của bạn bị khóa. Vui lòng liên hệ hỗ trợ để biết thêm chi tiết.\n\nTrân trọng,\nShopii Team`
-          );
+
+      if (action === "lock") {
+        auditAction = "USER_LOCK";
+        auditDescription = `Khóa người dùng ${user.username}`;
+
+        if (user.role === "seller") {
+          const store = await Store.findOne({ sellerId: user._id });
+          if (store) {
+            store.status = "rejected";
+            await store.save();
+
+            await sendEmail(
+              user.email,
+              "Cửa hàng của bạn đã bị từ chối",
+              `Kính gửi ${user.username}, ...`
+            );
+          }
         }
+      } else if (action === "unlock") {
+        auditAction = "USER_UNLOCK";
+        auditDescription = `Mở khóa người dùng ${user.username}`;
+      }
+
+      // Chỉ gửi Email khi thực sự có sự thay đổi trạng thái Lock <-> Unlock
+      if (action !== previousAction) {
+        const emailSubject =
+          action === "lock"
+            ? "Tài khoản của bạn đã bị khóa"
+            : "Tài khoản của bạn đã được mở khóa";
+
+        await sendEmail(user.email, emailSubject, `Kính gửi ${user.username}, ...`);
       }
     }
 
-    // Gửi email nếu action thay đổi
-    if (action && action !== previousAction) {
-      const emailSubject =
-        action === "lock"
-          ? "Tài khoản của bạn đã bị khóa"
-          : "Tài khoản của bạn đã được mở khóa";
-      const emailText =
-        action === "lock"
-          ? `Kính gửi ${user.username},\n\nTài khoản của bạn đã bị khóa bởi quản trị viên. Vui lòng liên hệ hỗ trợ để biết thêm chi tiết.\n\nTrân trọng,\nShopii Team`
-          : `Kính gửi ${user.username},\n\nTài khoản của bạn đã được mở khóa. Bạn có thể tiếp tục sử dụng dịch vụ của chúng tôi.\n\nTrân trọng,\nShopii Team`;
-      await sendEmail(user.email, emailSubject, emailText);
-    }
-
     await user.save();
+
+    // ===== Ghi Audit Log với đúng hành động =====
+    await createAuditLog({
+      admin: req.user.id,
+      action: auditAction, // Sẽ ra "USER_LOCK", "USER_UNLOCK" hoặc "USER_UPDATE"
+      targetType: "User",
+      targetId: user._id,
+      description: auditDescription,
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
+
     const userToReturn = user.toObject();
     delete userToReturn.password;
 
@@ -321,7 +360,7 @@ exports.updateUserByAdmin = async (req, res) => {
       data: userToReturn,
     });
   } catch (error) {
-    if (error.code === 11000 && error.keyPattern && error.keyPattern.email) {
+    if (error.code === 11000 && error.keyPattern?.email) {
       return handleError(res, error, "Email đã được sử dụng.", 400);
     }
     handleError(res, error, "Lỗi khi cập nhật người dùng");
@@ -1096,7 +1135,7 @@ exports.getAllDisputesAdmin = async (req, res) => {
       // find users matching username
       const users = await User.find({ username: { $regex: regex } }).select('_id');
       const userIds = users.map(u => u._id);
-      const orClauses = [ { description: { $regex: regex } } ];
+      const orClauses = [{ description: { $regex: regex } }];
       if (userIds.length) orClauses.push({ raisedBy: { $in: userIds } });
       // if search looks like an ObjectId, include orderItemId match
       if (mongoose.Types.ObjectId.isValid(search)) {
@@ -1918,5 +1957,27 @@ exports.updateUserRole = async (req, res) => {
     });
   } catch (error) {
     handleError(res, error, "Lỗi cập nhật vai trò người dùng", 500);
+  }
+};
+
+exports.getAuditLogs = async (req, res) => {
+  try {
+
+    const logs = await AuditLog.find()
+      .populate("admin", "fullname email")
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: logs,
+    });
+
+  } catch (err) {
+
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+
   }
 };
