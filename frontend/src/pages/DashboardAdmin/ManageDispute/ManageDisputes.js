@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import AdminDisputeService from './AdminDisputeService';
 
 export default function ManageDisputes() {
+  const { isMonitor } = useOutletContext() || {};
   const [disputes, setDisputes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -160,7 +162,12 @@ export default function ManageDisputes() {
 
                 <div className="mb-3">
                   <label className="block text-sm font-medium">Status</label>
-                  <select value={modalStatus} onChange={(e) => setModalStatus(e.target.value)} className="border px-2 py-1 mt-1 w-full">
+                  <select
+                    value={modalStatus}
+                    onChange={(e) => setModalStatus(e.target.value)}
+                    className="border px-2 py-1 mt-1 w-full"
+                    disabled={isMonitor}
+                  >
                     <option value="open">open</option>
                     <option value="under_review">under_review</option>
                     <option value="resolved">resolved</option>
@@ -170,12 +177,14 @@ export default function ManageDisputes() {
 
                 <div className="mb-3">
                   <label className="block text-sm font-medium">Resolution</label>
-                  <textarea rows={4} value={modalResolution} onChange={(e) => setModalResolution(e.target.value)} className="border w-full px-2 py-1 mt-1" />
+                  <textarea rows={4} value={modalResolution} onChange={(e) => setModalResolution(e.target.value)} className="border w-full px-2 py-1 mt-1" readOnly={isMonitor} />
                 </div>
 
                 <div className="flex justify-end gap-2">
                   <button className="px-3 py-1 border rounded" onClick={closeModal} disabled={modalSaving}>Cancel</button>
-                  <button className="px-3 py-1 bg-green-600 text-white rounded" onClick={handleSaveDetails} disabled={modalSaving}>{modalSaving ? 'Saving...' : 'Save'}</button>
+                  {!isMonitor && (
+                    <button className="px-3 py-1 bg-green-600 text-white rounded" onClick={handleSaveDetails} disabled={modalSaving}>{modalSaving ? 'Saving...' : 'Save'}</button>
+                  )}
                 </div>
               </div>
             </div>
