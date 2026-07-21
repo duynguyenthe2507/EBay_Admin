@@ -134,6 +134,7 @@ export default function AdminDashboardLayout() {
   const location = useLocation();
   const auth = useSelector((state) => state.auth);
   const userRole = auth?.user?.role;
+  const isMonitor = userRole === 'monitor'; // read-only observer role
   const [dashboardTitle, setDashboardTitle] = React.useState("Admin Dashboard");
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
@@ -195,8 +196,10 @@ export default function AdminDashboardLayout() {
     setDashboardTitle(newDashboardTitle);
 
   // Check if user can access a specific menu item based on role
+  // Monitor can view ALL tabs but cannot mutate data
   const canAccess = (requiredRoles) => {
     if (!userRole) return false;
+    if (userRole === 'monitor') return true; // monitor sees everything
     return requiredRoles.includes(userRole);
   };
 
@@ -454,7 +457,7 @@ export default function AdminDashboardLayout() {
                 mb: 3,
               }}
             >
-              <Outlet context={{ handleSetDashboardTitle }} />
+              <Outlet context={{ handleSetDashboardTitle, isMonitor }} />
             </Paper>
             <Copyright sx={{ pt: 4 }} />
           </Container>
