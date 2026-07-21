@@ -199,7 +199,7 @@ export default function SendEmail() {
             <ArrowBackIcon />
           </IconButton>
         </Tooltip>
-        <Title highlight>Send Email</Title>
+        <Typography variant="h6" fontWeight="bold" color="primary">Send Email</Typography>
       </Box>
 
       <Grid container spacing={3}>
