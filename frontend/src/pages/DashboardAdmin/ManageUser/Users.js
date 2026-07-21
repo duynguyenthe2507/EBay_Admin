@@ -114,7 +114,8 @@ export default function Users({
   totalUsers = 0,
   onPageChange,
   filters = { search: '', role: '', action: 'all', newUsers: false },
-  onFiltersChange
+  onFiltersChange,
+  isMonitor = false,
 }) {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -721,7 +722,7 @@ export default function Users({
                       <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Role</TableCell>
                       <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
                       <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Created</TableCell>
-                      <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="center">Actions</TableCell>
+                      <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="center">{isMonitor ? 'View' : 'Actions'}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -780,28 +781,30 @@ export default function Users({
                           </TableCell>
                           <TableCell align="center">
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-                              {user.action === 'unlock' ? (
-                                <Tooltip title="Lock Account">
-                                  <IconButton
-                                    size="small"
-                                    color="warning"
-                                    onClick={() => handleLockUnlock(user, 'lock')}
-                                    disabled={loading}
-                                  >
-                                    <LockPersonIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              ) : (
-                                <Tooltip title="Unlock Account">
-                                  <IconButton
-                                    size="small"
-                                    color="success"
-                                    onClick={() => handleLockUnlock(user, 'unlock')}
-                                    disabled={loading}
-                                  >
-                                    <LockOpenIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
+                              {!isMonitor && (
+                                user.action === 'unlock' ? (
+                                  <Tooltip title="Lock Account">
+                                    <IconButton
+                                      size="small"
+                                      color="warning"
+                                      onClick={() => handleLockUnlock(user, 'lock')}
+                                      disabled={loading}
+                                    >
+                                      <LockPersonIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                ) : (
+                                  <Tooltip title="Unlock Account">
+                                    <IconButton
+                                      size="small"
+                                      color="success"
+                                      onClick={() => handleLockUnlock(user, 'unlock')}
+                                      disabled={loading}
+                                    >
+                                      <LockOpenIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                )
                               )}
                               <IconButton
                                 size="small"
@@ -851,19 +854,21 @@ export default function Users({
           sx: { minWidth: 180, boxShadow: '0px 2px 10px rgba(0,0,0,0.1)', borderRadius: 2 }
         }}
       >
-        <MenuItem onClick={() => handleUserAction('edit')}>
-          <ListItemIcon>
-            <EditIcon fontSize="small" color="primary" />
-          </ListItemIcon>
-          <ListItemText>Edit</ListItemText>
-        </MenuItem>
+        {!isMonitor && (
+          <MenuItem onClick={() => handleUserAction('edit')}>
+            <ListItemIcon>
+              <EditIcon fontSize="small" color="primary" />
+            </ListItemIcon>
+            <ListItemText>Edit</ListItemText>
+          </MenuItem>
+        )}
         <MenuItem onClick={() => handleUserAction('view')}>
           <ListItemIcon>
             <VisibilityIcon fontSize="small" color="info" />
           </ListItemIcon>
           <ListItemText>View Details</ListItemText>
         </MenuItem>
-        {(selectedUser?.accountStatus === 'pending' || !selectedUser?.accountStatus) && (
+        {!isMonitor && (selectedUser?.accountStatus === 'pending' || !selectedUser?.accountStatus) && (
           <MenuItem onClick={() => handleApproveClick(selectedUser)}>
             <ListItemIcon>
               <CheckCircleIcon fontSize="small" color="success" />
@@ -871,7 +876,7 @@ export default function Users({
             <ListItemText>Duyệt Tài Khoản</ListItemText>
           </MenuItem>
         )}
-        {(selectedUser?.accountStatus === 'approved' || selectedUser?.accountStatus === 'pending' || !selectedUser?.accountStatus) && (
+        {!isMonitor && (selectedUser?.accountStatus === 'approved' || selectedUser?.accountStatus === 'pending' || !selectedUser?.accountStatus) && (
           <MenuItem onClick={() => handleRejectClick(selectedUser)}>
             <ListItemIcon>
               <BlockIcon fontSize="small" color="error" />
@@ -879,14 +884,16 @@ export default function Users({
             <ListItemText>Từ Chối Tài Khoản</ListItemText>
           </MenuItem>
         )}
-        <Divider />
-        <MenuItem onClick={() => handleUserAction('delete')}>
-          <ListItemIcon>
-            <DeleteIcon fontSize="small" color="error" />
-          </ListItemIcon>
-          <ListItemText>Delete User</ListItemText>
-        </MenuItem>
-        {selectedUser?.action === 'unlock' && (
+        {!isMonitor && <Divider />}
+        {!isMonitor && (
+          <MenuItem onClick={() => handleUserAction('delete')}>
+            <ListItemIcon>
+              <DeleteIcon fontSize="small" color="error" />
+            </ListItemIcon>
+            <ListItemText>Delete User</ListItemText>
+          </MenuItem>
+        )}
+        {!isMonitor && selectedUser?.action === 'unlock' && (
           <MenuItem onClick={() => handleUserAction('lock')}>
             <ListItemIcon>
               <LockPersonIcon fontSize="small" color="warning" />
@@ -894,7 +901,7 @@ export default function Users({
             <ListItemText>Lock Account</ListItemText>
           </MenuItem>
         )}
-        {selectedUser?.action === 'lock' && (
+        {!isMonitor && selectedUser?.action === 'lock' && (
           <MenuItem onClick={() => handleUserAction('unlock')}>
             <ListItemIcon>
               <LockOpenIcon fontSize="small" color="success" />

@@ -7,7 +7,7 @@ import { useOutletContext } from "react-router-dom";
 import axios from "axios";
 
 export default function ManageStore() {
-  const { handleSetDashboardTitle } = useOutletContext();
+  const { handleSetDashboardTitle, isMonitor } = useOutletContext();
   const [stores, setStores] = React.useState([]);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [totalPages, setTotalPages] = React.useState(1);
@@ -55,6 +55,7 @@ export default function ManageStore() {
             onStoreUpdated={updateStoreList}
             currentPage={currentPage}
             totalPages={totalPages}
+            isMonitor={isMonitor}
             onPageChange={handlePageChange}
           />
         </Paper>

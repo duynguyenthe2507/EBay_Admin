@@ -46,7 +46,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
-export default function Stores({ stores: initialStores, onStoreUpdated }) {
+export default function Stores({ stores: initialStores, onStoreUpdated, isMonitor = false }) {
   const [deletingStore, setDeletingStore] = React.useState(null);
   const [editingStore, setEditingStore] = React.useState(null);
   const [snackbar, setSnackbar] = React.useState({
@@ -488,7 +488,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
                     <TableCell>Seller Email</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Rating</TableCell>
-                    <TableCell align="right">Actions</TableCell>
+                    <TableCell align="right">{isMonitor ? 'View' : 'Actions'}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -546,37 +546,44 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
                       </TableCell>
                       <TableCell align="right">
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                          <Tooltip title="Edit Store">
-                            <IconButton
-                              color="primary"
-                              onClick={() => setEditingStore(store)}
-                              size="small"
-                              sx={{ 
-                                bgcolor: 'rgba(25,118,210,0.08)',
-                                mr: 1,
-                                '&:hover': {
-                                  bgcolor: 'rgba(25,118,210,0.15)'
-                                }
-                              }}
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Delete Store">
-                            <IconButton
-                              color="error"
-                              onClick={() => setDeletingStore(store)}
-                              size="small"
-                              sx={{ 
-                                bgcolor: 'rgba(244,67,54,0.08)',
-                                '&:hover': {
-                                  bgcolor: 'rgba(244,67,54,0.15)'
-                                }
-                              }}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
+                          {!isMonitor && (
+                            <Tooltip title="Edit Store">
+                              <IconButton
+                                color="primary"
+                                onClick={() => setEditingStore(store)}
+                                size="small"
+                                sx={{ 
+                                  bgcolor: 'rgba(25,118,210,0.08)',
+                                  mr: 1,
+                                  '&:hover': {
+                                    bgcolor: 'rgba(25,118,210,0.15)'
+                                  }
+                                }}
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          {!isMonitor && (
+                            <Tooltip title="Delete Store">
+                              <IconButton
+                                color="error"
+                                onClick={() => setDeletingStore(store)}
+                                size="small"
+                                sx={{ 
+                                  bgcolor: 'rgba(244,67,54,0.08)',
+                                  '&:hover': {
+                                    bgcolor: 'rgba(244,67,54,0.15)'
+                                  }
+                                }}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          {isMonitor && (
+                            <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>View only</Typography>
+                          )}
                         </Box>
                       </TableCell>
                     </TableRow>
