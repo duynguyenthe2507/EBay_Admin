@@ -317,8 +317,8 @@ export default function AdminDashboardLayout() {
                 </>
               )}
 
-              {/* Manage Stores - Admin & Finance only */}
-              {canAccess(['admin', 'finance']) && (
+              {/* Manage Stores - Admin & Support */}
+              {canAccess(['admin', 'support']) && (
                 <ListItemButton
                   onClick={handleOnclickStores}
                   selected={currentPath === "/admin/manage-stores"}
@@ -389,8 +389,8 @@ export default function AdminDashboardLayout() {
                 </ListItemButton>
               )}
 
-              {/* Manage Vouchers - Admin & Support & Finance */}
-              {canAccess(['admin', 'support', 'finance']) && (
+              {/* Manage Vouchers - Admin & Finance */}
+              {canAccess(['admin', 'finance']) && (
                 <ListItemButton
                   onClick={handleOnclickVouchers}
                   selected={currentPath === "/admin/manage-vouchers"}
@@ -407,8 +407,8 @@ export default function AdminDashboardLayout() {
                 </ListItemButton>
               )}
 
-              {/* Manage Orders - Admin only */}
-              {canAccess(['admin']) && (
+              {/* Manage Orders - Admin & Finance */}
+              {canAccess(['admin', 'finance']) && (
                 <ListItemButton
                   onClick={handleOnclickOrders}
                   selected={currentPath === "/admin/manage-orders"}
