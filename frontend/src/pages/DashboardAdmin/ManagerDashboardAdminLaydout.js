@@ -196,8 +196,9 @@ export default function AdminDashboardLayout() {
 
   // Check if user can access a specific menu item based on role
   const canAccess = (requiredRoles) => {
-    if (!userRole) return false;
-    return requiredRoles.includes(userRole);
+    const currentRole = adminInfo?.role || userRole;
+    if (!currentRole) return false;
+    return requiredRoles.includes(currentRole);
   };
 
   const handleOnclickOverview = () => {
@@ -327,8 +328,8 @@ export default function AdminDashboardLayout() {
                 </>
               )}
 
-              {/* Manage Stores - Admin & Finance only */}
-              {canAccess(['admin', 'finance']) && (
+              {/* Manage Stores - Admin & Support */}
+              {canAccess(['admin', 'support']) && (
                 <ListItemButton
                   sx={{ pl: 4, display: 'block' }}
                   onClick={handleOnclickStores}
@@ -364,8 +365,8 @@ export default function AdminDashboardLayout() {
                 </ListItemButton>
               )}
 
-              {/* Manage Reviews - Admin & Support */}
-              {canAccess(['admin', 'support']) && (
+              {/* Manage Reviews - Admin only */}
+              {canAccess(['admin']) && (
                 <ListItemButton
                   onClick={() => navigate("/admin/manage-reviews")}
                   selected={currentPath === "/admin/manage-reviews"}
@@ -400,8 +401,8 @@ export default function AdminDashboardLayout() {
                 </ListItemButton>
               )}
 
-              {/* Manage Vouchers - Admin & Support & Finance */}
-              {canAccess(['admin', 'support', 'finance']) && (
+              {/* Manage Vouchers - Admin & Finance */}
+              {canAccess(['admin', 'finance']) && (
                 <ListItemButton
                   onClick={handleOnclickVouchers}
                   selected={currentPath === "/admin/manage-vouchers"}
