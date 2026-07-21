@@ -1,34 +1,21 @@
 # EBay_Admin
 
-## Project Overview
-
-This project is a backend application designed for managing an eBay-like platform. It utilizes Node.js, Express.js, and JavaScript to provide a RESTful API for handling various functionalities, including user authentication, product management, cart operations, payment processing, and more.
-
-## Key Features & Benefits
-
-*   **RESTful API:** Provides a well-structured API for interacting with the backend services.
-*   **User Authentication:** Secure user registration, login, and authentication mechanisms.
-*   **Product Management:**  Features for creating, updating, and managing product listings.
-*   **Cart Operations:** Functionality for managing user shopping carts.
-*   **Payment Processing:** Integrations with payment gateways for secure transactions (VietQR and PayOS, potentially others).
-*   **Category Management:** Create and manage product categories.
-*   **Chat Functionality:** Real-time chat implementation between users and admins.
-*   **Dispute Management:** System for handling disputes between buyers and sellers.
-*   **Scheduled Tasks:** Utilizes `node-cron` for periodic tasks like payment verification.
-*   **Cloudinary Integration:**  For image storage and management.
-*   **Socket.IO:** Implements real-time communication.
-
-## Prerequisites & Dependencies
-
-Before you begin, ensure you have met the following requirements:
-
-*   **Node.js:**  (v16 or higher recommended) - [https://nodejs.org/](https://nodejs.org/)
-*   **npm** or **Yarn:** Package managers included with Node.js.
-*   **MongoDB:** Database - [https://www.mongodb.com/](https://www.mongodb.com/)
-*   **Cloudinary Account:**  For image storage.
-*   **Environment Variables:**  Set up necessary environment variables (see Configuration section).
-
 ## Installation & Setup Instructions
+
+**Quick instruction:**
+    
+    ```bash
+    npm run install:all
+    ```
+
+    ```bash
+    node db/seed.js
+    ```
+    
+    ```bash
+    npm start
+    ```
+    > Access admin dashboard: `http://localhost:3000/` or `http://localhost:3000/admin`
 
 1.  **Clone the Repository:**
 
@@ -92,6 +79,34 @@ Before you begin, ensure you have met the following requirements:
     ```bash
     node db/seed.js
     ```
+
+## Project Overview
+
+This project is a backend application designed for managing an eBay-like platform. It utilizes Node.js, Express.js, and JavaScript to provide a RESTful API for handling various functionalities, including user authentication, product management, cart operations, payment processing, and more.
+
+## Key Features & Benefits
+
+*   **RESTful API:** Provides a well-structured API for interacting with the backend services.
+*   **User Authentication:** Secure user registration, login, and authentication mechanisms.
+*   **Product Management:**  Features for creating, updating, and managing product listings.
+*   **Cart Operations:** Functionality for managing user shopping carts.
+*   **Payment Processing:** Integrations with payment gateways for secure transactions (VietQR and PayOS, potentially others).
+*   **Category Management:** Create and manage product categories.
+*   **Chat Functionality:** Real-time chat implementation between users and admins.
+*   **Dispute Management:** System for handling disputes between buyers and sellers.
+*   **Scheduled Tasks:** Utilizes `node-cron` for periodic tasks like payment verification.
+*   **Cloudinary Integration:**  For image storage and management.
+*   **Socket.IO:** Implements real-time communication.
+
+## Prerequisites & Dependencies
+
+Before you begin, ensure you have met the following requirements:
+
+*   **Node.js:**  (v16 or higher recommended) - [https://nodejs.org/](https://nodejs.org/)
+*   **npm** or **Yarn:** Package managers included with Node.js.
+*   **MongoDB:** Database - [https://www.mongodb.com/](https://www.mongodb.com/)
+*   **Cloudinary Account:**  For image storage.
+*   **Environment Variables:**  Set up necessary environment variables (see Configuration section).
 
 ## Usage Examples & API Documentation
 
