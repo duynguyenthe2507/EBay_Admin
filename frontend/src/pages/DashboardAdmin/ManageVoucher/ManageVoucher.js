@@ -3,13 +3,13 @@ import { useOutletContext } from 'react-router-dom';
 import VoucherList from './VoucherList';
 
 const ManageVoucher = () => {
-  const { handleSetDashboardTitle } = useOutletContext();
+  const { handleSetDashboardTitle, isMonitor } = useOutletContext();
   
   useEffect(() => {
     handleSetDashboardTitle("Voucher Management");
   }, [handleSetDashboardTitle]);
 
-  return <VoucherList />;
+  return <VoucherList isMonitor={isMonitor} />;
 };
 
 export default ManageVoucher; 

@@ -5,8 +5,6 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Pagination from "@mui/material/Pagination";
-import Stack from "@mui/material/Stack";
-import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import Tooltip from "@mui/material/Tooltip";
@@ -20,12 +18,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  FormControlLabel,
-  FormGroup,
   IconButton,
   Paper,
-  Radio,
-  RadioGroup,
   Snackbar,
   TableContainer,
   TextField,
@@ -46,7 +40,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
-export default function Stores({ stores: initialStores, onStoreUpdated }) {
+export default function Stores({ stores: initialStores, onStoreUpdated, isMonitor = false }) {
   const [deletingStore, setDeletingStore] = React.useState(null);
   const [editingStore, setEditingStore] = React.useState(null);
   const [snackbar, setSnackbar] = React.useState({
@@ -67,9 +61,8 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
         `http://localhost:9999/api/admin/stores/${deletingStore._id}`,
         {
           headers: {
-            Authorization: `Bearer ${
-              localStorage.getItem("accessToken") || ""
-            }`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken") || ""
+              }`,
           },
         }
       );
@@ -89,9 +82,8 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
       console.error("Delete error:", error.response || error);
       setSnackbar({
         open: true,
-        msg: `Lỗi khi xóa cửa hàng! ${
-          error.response?.data?.message || error.message
-        }`,
+        msg: `Lỗi khi xóa cửa hàng! ${error.response?.data?.message || error.message
+          }`,
         severity: "error",
       });
       setDeletingStore(null);
@@ -204,9 +196,9 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
         open={Boolean(deletingStore)}
         onClose={() => setDeletingStore(null)}
         PaperProps={{
-          sx: { 
+          sx: {
             borderRadius: 2,
-            boxShadow: "0 8px 24px rgba(0,0,0,0.12)" 
+            boxShadow: "0 8px 24px rgba(0,0,0,0.12)"
           }
         }}
       >
@@ -223,19 +215,19 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button 
-            onClick={() => setDeletingStore(null)} 
-            color="inherit" 
+          <Button
+            onClick={() => setDeletingStore(null)}
+            color="inherit"
             variant="outlined"
             sx={{ borderRadius: 2 }}
           >
             Huỷ
           </Button>
-          <Button 
-            onClick={handleDeleteStore} 
-            color="error" 
+          <Button
+            onClick={handleDeleteStore}
+            color="error"
             variant="contained"
-            sx={{ 
+            sx={{
               borderRadius: 2,
               boxShadow: "none",
               '&:hover': {
@@ -247,14 +239,14 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       <Snackbar
         open={snackbar.open}
         autoHideDuration={2500}
         onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert 
+        <Alert
           severity={snackbar.severity}
           variant="filled"
           sx={{ borderRadius: 2 }}
@@ -271,8 +263,8 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
           minHeight: "80vh",
         }}
       >
-        <Box 
-          display="flex" 
+        <Box
+          display="flex"
           alignItems="center"
           mb={3}
           p={1}
@@ -286,7 +278,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
             {filteredStores.length} stores found
           </Typography>
         </Box>
-        
+
         <Grid container spacing={3}>
           <Grid item xs={12} md={3}>
             <Card
@@ -320,25 +312,25 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
                   </Typography>
                   {(selectedStatuses.length > 0 ||
                     selectedRatingRanges.length > 0) && (
-                    <Tooltip title="Clear all">
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          setSelectedStatuses([]);
-                          setSelectedRatingRanges([]);
-                          setKeywords("");
-                        }}
-                        sx={{ 
-                          bgcolor: 'rgba(0,0,0,0.04)',
-                          '&:hover': {
-                            bgcolor: 'rgba(0,0,0,0.08)'
-                          }
-                        }}
-                      >
-                        <ClearAllIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
+                      <Tooltip title="Clear all">
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setSelectedStatuses([]);
+                            setSelectedRatingRanges([]);
+                            setKeywords("");
+                          }}
+                          sx={{
+                            bgcolor: 'rgba(0,0,0,0.04)',
+                            '&:hover': {
+                              bgcolor: 'rgba(0,0,0,0.08)'
+                            }
+                          }}
+                        >
+                          <ClearAllIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                 </Box>
 
                 {/* Search */}
@@ -350,7 +342,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
                     fullWidth
                     label="Search stores"
                     placeholder="Enter store name or seller"
-                    InputProps={{ 
+                    InputProps={{
                       endAdornment: <SearchIcon color="action" />,
                       sx: {
                         borderRadius: 2,
@@ -418,7 +410,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
                     }}
                   >
                     {ratingRanges.map((range) => (
-                      <Box 
+                      <Box
                         key={range.label}
                         onClick={() => handleRatingRangeChange(range.label)}
                         sx={{
@@ -460,7 +452,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
               </CardContent>
             </Card>
           </Grid>
-          
+
           <Grid item xs={12} md={9}>
             <TableContainer
               component={Paper}
@@ -488,7 +480,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
                     <TableCell>Seller Email</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Rating</TableCell>
-                    <TableCell align="right">Actions</TableCell>
+                    <TableCell align="right">{isMonitor ? 'View' : 'Actions'}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -517,15 +509,15 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
                       <TableCell>{store.sellerId?.username || "N/A"}</TableCell>
                       <TableCell>{store.sellerId?.email}</TableCell>
                       <TableCell>
-                        <Chip 
-                          label={store.status} 
+                        <Chip
+                          label={store.status}
                           size="small"
-                          sx={{ 
+                          sx={{
                             bgcolor: `${getStatusColor(store.status)}20`,
                             color: getStatusColor(store.status),
                             fontWeight: 500,
                             borderRadius: 1
-                          }} 
+                          }}
                         />
                       </TableCell>
                       <TableCell>
@@ -546,37 +538,44 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
                       </TableCell>
                       <TableCell align="right">
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                          <Tooltip title="Edit Store">
-                            <IconButton
-                              color="primary"
-                              onClick={() => setEditingStore(store)}
-                              size="small"
-                              sx={{ 
-                                bgcolor: 'rgba(25,118,210,0.08)',
-                                mr: 1,
-                                '&:hover': {
-                                  bgcolor: 'rgba(25,118,210,0.15)'
-                                }
-                              }}
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Delete Store">
-                            <IconButton
-                              color="error"
-                              onClick={() => setDeletingStore(store)}
-                              size="small"
-                              sx={{ 
-                                bgcolor: 'rgba(244,67,54,0.08)',
-                                '&:hover': {
-                                  bgcolor: 'rgba(244,67,54,0.15)'
-                                }
-                              }}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
+                          {!isMonitor && (
+                            <Tooltip title="Edit Store">
+                              <IconButton
+                                color="primary"
+                                onClick={() => setEditingStore(store)}
+                                size="small"
+                                sx={{
+                                  bgcolor: 'rgba(25,118,210,0.08)',
+                                  mr: 1,
+                                  '&:hover': {
+                                    bgcolor: 'rgba(25,118,210,0.15)'
+                                  }
+                                }}
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          {!isMonitor && (
+                            <Tooltip title="Delete Store">
+                              <IconButton
+                                color="error"
+                                onClick={() => setDeletingStore(store)}
+                                size="small"
+                                sx={{
+                                  bgcolor: 'rgba(244,67,54,0.08)',
+                                  '&:hover': {
+                                    bgcolor: 'rgba(244,67,54,0.15)'
+                                  }
+                                }}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          {isMonitor && (
+                            <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>View only</Typography>
+                          )}
                         </Box>
                       </TableCell>
                     </TableRow>
@@ -593,7 +592,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
                 </TableBody>
               </Table>
             </TableContainer>
-            
+
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
               <Pagination
                 page={currentPage}
@@ -604,7 +603,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated }) {
                 shape="rounded"
                 showFirstButton
                 showLastButton
-                sx={{ 
+                sx={{
                   '& .MuiPaginationItem-root': {
                     borderRadius: 1,
                     mx: 0.2

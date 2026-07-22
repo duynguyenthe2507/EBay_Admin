@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import AdminReviewService from './AdminReviewService';
 
 export default function ManageReviews() {
+  const { isMonitor } = useOutletContext() || {};
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -105,7 +107,10 @@ export default function ManageReviews() {
                   <td className="px-4 py-2">{r.rating}</td>
                   <td className="px-4 py-2">{r.comment}</td>
                   <td className="px-4 py-2">
-                    <button className="mr-2 px-2 py-1 bg-red-500 text-white rounded" onClick={() => handleDelete(r._id)}>Delete</button>
+                    {!isMonitor && (
+                      <button className="mr-2 px-2 py-1 bg-red-500 text-white rounded" onClick={() => handleDelete(r._id)}>Delete</button>
+                    )}
+                    {isMonitor && <span className="text-gray-400 text-sm italic">View only</span>}
                   </td>
                 </tr>
               ))}

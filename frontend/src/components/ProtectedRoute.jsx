@@ -29,6 +29,12 @@ const ProtectedRoute = ({ allowedRoles = [], children }) => {
 
   // User is authenticated but doesn't have permission
   console.warn(`User role '${user?.role}' not in allowed roles: ${allowedRoles.join(', ')}`);
+  
+  const adminRoles = ['admin', 'monitor', 'support', 'finance'];
+  if (user && adminRoles.includes(user.role)) {
+    return <Navigate to="/admin" replace />;
+  }
+  
   return <Navigate to="/" replace />; // redirect to home
 };
 

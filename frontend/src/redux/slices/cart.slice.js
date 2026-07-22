@@ -2,11 +2,21 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import { toast } from "react-toastify";
 import CartService from "../../services/api/CartService";
 
-const userId = null
-
-export const fetchCart = createAsyncThunk('cart/fetchCart', async () => {
-  const res = await CartService.getAllProducts(userId)
-  return res.items
+export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, thunkAPI) => {
+  const state = thunkAPI.getState();
+  const userId = state.auth?.user?._id || state.orebi?.userInfo?._id || localStorage.getItem('userId');
+  
+  if (!userId) {
+    return [];
+  }
+  
+  try {
+    const res = await CartService.getAllProducts(userId);
+    return res?.items || [];
+  } catch (error) {
+    console.error("Failed to fetch cart:", error);
+    return [];
+  }
 })
 
 const initialState = {

@@ -1,34 +1,21 @@
 # EBay_Admin
 
-## Project Overview
-
-This project is a backend application designed for managing an eBay-like platform. It utilizes Node.js, Express.js, and JavaScript to provide a RESTful API for handling various functionalities, including user authentication, product management, cart operations, payment processing, and more.
-
-## Key Features & Benefits
-
-*   **RESTful API:** Provides a well-structured API for interacting with the backend services.
-*   **User Authentication:** Secure user registration, login, and authentication mechanisms.
-*   **Product Management:**  Features for creating, updating, and managing product listings.
-*   **Cart Operations:** Functionality for managing user shopping carts.
-*   **Payment Processing:** Integrations with payment gateways for secure transactions (VietQR and PayOS, potentially others).
-*   **Category Management:** Create and manage product categories.
-*   **Chat Functionality:** Real-time chat implementation between users and admins.
-*   **Dispute Management:** System for handling disputes between buyers and sellers.
-*   **Scheduled Tasks:** Utilizes `node-cron` for periodic tasks like payment verification.
-*   **Cloudinary Integration:**  For image storage and management.
-*   **Socket.IO:** Implements real-time communication.
-
-## Prerequisites & Dependencies
-
-Before you begin, ensure you have met the following requirements:
-
-*   **Node.js:**  (v16 or higher recommended) - [https://nodejs.org/](https://nodejs.org/)
-*   **npm** or **Yarn:** Package managers included with Node.js.
-*   **MongoDB:** Database - [https://www.mongodb.com/](https://www.mongodb.com/)
-*   **Cloudinary Account:**  For image storage.
-*   **Environment Variables:**  Set up necessary environment variables (see Configuration section).
-
 ## Installation & Setup Instructions
+
+**Quick instruction:**
+    
+    ```bash
+    npm run install:all
+    ```
+
+    ```bash
+    node db/seed.js
+    ```
+    
+    ```bash
+    npm start
+    ```
+    > Access admin dashboard: `http://localhost:3000/` or `http://localhost:3000/admin`
 
 1.  **Clone the Repository:**
 
@@ -37,19 +24,13 @@ Before you begin, ensure you have met the following requirements:
     cd EBay_Admin
     ```
 
-2.  **Navigate to the Backend Directory:**
+2.  **Install Dependencies:**
 
     ```bash
-    cd backend
+    npm run install:all
     ```
 
-3.  **Install Dependencies:**
-
-    ```bash
-    npm install  # or yarn install
-    ```
-
-4.  **Configure Environment Variables:**
+3.  **Configure Environment Variables:**
 
     Create a `.env` file in the `backend` directory and populate it with the necessary environment variables (see Configuration Options).  Example variables (replace with your actual values):
 
@@ -82,7 +63,7 @@ Before you begin, ensure you have met the following requirements:
     BANK_ACCOUNT_NAME=***
     ```
 
-5.  **Start the Server:**
+4.  **Start the Server:**
 
     ```bash
     npm run dev # For development with nodemon
@@ -90,8 +71,42 @@ Before you begin, ensure you have met the following requirements:
     npm start # For production
     ```
 
-6.  **Database Setup:**
+5.  **Database Setup and Seeding Data:**
     Ensure MongoDB is running and accessible at the specified `MONGODB_URI`.  You may need to create the database (`ebay_admin` in the example above) manually.
+
+    After that, run this command to seeding data for db:
+
+    ```bash
+    node db/seed.js
+    ```
+
+## Project Overview
+
+This project is a backend application designed for managing an eBay-like platform. It utilizes Node.js, Express.js, and JavaScript to provide a RESTful API for handling various functionalities, including user authentication, product management, cart operations, payment processing, and more.
+
+## Key Features & Benefits
+
+*   **RESTful API:** Provides a well-structured API for interacting with the backend services.
+*   **User Authentication:** Secure user registration, login, and authentication mechanisms.
+*   **Product Management:**  Features for creating, updating, and managing product listings.
+*   **Cart Operations:** Functionality for managing user shopping carts.
+*   **Payment Processing:** Integrations with payment gateways for secure transactions (VietQR and PayOS, potentially others).
+*   **Category Management:** Create and manage product categories.
+*   **Chat Functionality:** Real-time chat implementation between users and admins.
+*   **Dispute Management:** System for handling disputes between buyers and sellers.
+*   **Scheduled Tasks:** Utilizes `node-cron` for periodic tasks like payment verification.
+*   **Cloudinary Integration:**  For image storage and management.
+*   **Socket.IO:** Implements real-time communication.
+
+## Prerequisites & Dependencies
+
+Before you begin, ensure you have met the following requirements:
+
+*   **Node.js:**  (v16 or higher recommended) - [https://nodejs.org/](https://nodejs.org/)
+*   **npm** or **Yarn:** Package managers included with Node.js.
+*   **MongoDB:** Database - [https://www.mongodb.com/](https://www.mongodb.com/)
+*   **Cloudinary Account:**  For image storage.
+*   **Environment Variables:**  Set up necessary environment variables (see Configuration section).
 
 ## Usage Examples & API Documentation
 

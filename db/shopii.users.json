@@ -1,91 +1,106 @@
-[{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610c88"
-  },
-  "username": "johndoe",
-  "fullname": "John Doe",
-  "email": "thangnguyen11112002@gmail.com",
-  "password": "$2b$10$GHVNmgYB9W9RE2Fs6BCAsOeMl5ec.KjMQ8sOTHRmaak0yJ3qZGkBe",
-  "role": "buyer",
-  "avatarURL": "https://example.com/avatars/john.jpg",
-  "action": "unlock",
-  "createdAt": {
-    "$date": "2023-06-21T10:00:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2025-07-24T07:12:57.150Z"
-  }
-},
-{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610c89"
-  },
-  "username": "janesmith",
-  "fullname": "Jane Smith",
-  "email": "thangndhe172360@fpt.edu.vn",
-  "password": "$2b$10$aVlJe6bEhcR6BHZ2RequteMMjVlEJ9Wbv.RZ7rsWPs9mIL2wyhMTC",
-  "role": "seller",
-  "avatarURL": "https://sm.ign.com/t/ign_nordic/cover/a/avatar-gen/avatar-generations_prsz.600.jpg",
-  "action": "unlock",
-  "createdAt": {
-    "$date": "2023-06-21T11:00:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2025-07-16T05:02:34.681Z"
-  }
-},
-{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610c8a"
-  },
-  "username": "admin",
-  "fullname": "Admin User",
-  "email": "winfourt4@gmail.com",
-  "password": "$2b$10$04H3KSPmEpRVaKn8DANpleVj9/lwCs3gTuu5EeJTU0iEb.hK9Qbom",
-  "role": "admin",
-  "avatarURL": "https://example.com/avatars/admin.jpg",
-  "action": "unlock",
-  "createdAt": {
-    "$date": "2023-06-21T09:00:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2025-07-24T06:26:46.325Z"
-  }
-},
-{
-  "_id": {
-    "$oid": "690c7fdaaa95f07461f075b7"
-  },
-  "username": "dat10bn@gmail.com",
-  "fullname": "Nguyễn Tiến Đạt",
-  "email": "admin@gmail.com",
-  "password": "$2b$10$pp4wgSirb8ql9onhjOFqvOLF1SP.xmAWmp26IW8NFPXisozTdbadC",
-  "role": "admin",
-  "action": "unlock",
-  "createdAt": {
-    "$date": "2025-11-06T11:00:42.056Z"
-  },
-  "updatedAt": {
-    "$date": "2025-11-11T15:37:05.928Z"
-  },
-  "__v": 2,
-  "trustedDevices": [
-    {
-      "tokenHash": "917aa1a7794efc0697cb1098a8f1cafb0287cff7af6841ce19a6ab1ad4c2e620",
-      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0",
-      "expiresAt": {
-        "$date": "2025-12-11T15:37:05.926Z"
-      },
-      "_id": {
-        "$oid": "691358216ea88d40f27d813b"
-      },
-      "createdAt": {
-        "$date": "2025-11-11T15:37:05.927Z"
-      }
+[
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "username": "johndoe",
+    "fullname": "John Doe",
+    "email": "thangnguyen11112002@gmail.com",
+    "password": "$2b$10$GHVNmgYB9W9RE2Fs6BCAsOeMl5ec.KjMQ8sOTHRmaak0yJ3qZGkBe",
+    "role": "buyer",
+    "avatarURL": "https://example.com/avatars/john.jpg",
+    "action": "unlock",
+    "createdAt": {
+      "$date": "2023-06-21T10:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-24T07:12:57.150Z"
     }
-  ],
-  "twoFAEnabled": true,
-  "twoFASecret": "JFHUST2KHFNHW4TFJQ4EYNTDMI4CIXJRNUZXATJJPBPE6TCLNFTQ",
-  "accountStatus": "approved"
-}
+  },
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610c89"
+    },
+    "username": "janesmith",
+    "fullname": "Jane Smith",
+    "email": "thangndhe172360@fpt.edu.vn",
+    "password": "$2b$10$aVlJe6bEhcR6BHZ2RequteMMjVlEJ9Wbv.RZ7rsWPs9mIL2wyhMTC",
+    "role": "seller",
+    "avatarURL": "https://sm.ign.com/t/ign_nordic/cover/a/avatar-gen/avatar-generations_prsz.600.jpg",
+    "action": "unlock",
+    "createdAt": {
+      "$date": "2023-06-21T11:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-16T05:02:34.681Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610c8a"
+    },
+    "username": "admin",
+    "fullname": "Admin User",
+    "email": "winfourt4@gmail.com",
+    "password": "$2b$10$04H3KSPmEpRVaKn8DANpleVj9/lwCs3gTuu5EeJTU0iEb.hK9Qbom",
+    "role": "admin",
+    "avatarURL": "https://example.com/avatars/admin.jpg",
+    "action": "unlock",
+    "createdAt": {
+      "$date": "2023-06-21T09:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-24T06:26:46.325Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690c7fdaaa95f07461f075b7"
+    },
+    "username": "dat10bn@gmail.com",
+    "fullname": "Nguyễn Tiến Đạt",
+    "email": "admin@gmail.com",
+    "password": "$2b$10$pp4wgSirb8ql9onhjOFqvOLF1SP.xmAWmp26IW8NFPXisozTdbadC",
+    "role": "admin",
+    "action": "unlock",
+    "createdAt": {
+      "$date": "2025-11-06T11:00:42.056Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-11T15:37:05.928Z"
+    },
+    "__v": 2,
+    "trustedDevices": [
+      {
+        "tokenHash": "917aa1a7794efc0697cb1098a8f1cafb0287cff7af6841ce19a6ab1ad4c2e620",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0",
+        "expiresAt": {
+          "$date": "2025-12-11T15:37:05.926Z"
+        },
+        "_id": {
+          "$oid": "691358216ea88d40f27d813b"
+        },
+        "createdAt": {
+          "$date": "2025-11-11T15:37:05.927Z"
+        }
+      }
+    ],
+    "twoFAEnabled": true,
+    "twoFASecret": "JFHUST2KHFNHW4TFJQ4EYNTDMI4CIXJRNUZXATJJPBPE6TCLNFTQ",
+    "accountStatus": "approved"
+  },
+  {
+    "username": "sysadmin",
+    "fullname": "sysadmin",
+    "email": "sysadmin@gmail.com",
+    "password": "$2b$10$65Ex5GqnRiem2XBERex2AuI8hh5TUrIXADpWmMzZgjEdaE1QRSIzG",
+    "role": "admin",
+    "action": "unlock",
+    "accountStatus": "approved",
+    "twoFAEnabled": false,
+    "trustedDevices": [],
+    "createdAt": "2026-07-21T11:38:58.002+00:00",
+    "updatedAt": "2026-07-21T11:38:58.002+00:00",
+    "__v": 0
+  }
 ]

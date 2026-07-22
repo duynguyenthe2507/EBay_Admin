@@ -22,13 +22,10 @@ import AuthenService from "../../services/api/AuthenService";
 import { resetUserInfo } from "../../redux/slices/orebi.slice";
 import { useDispatch } from "react-redux";
 import PeopleIcon from "@mui/icons-material/People";
-import Collapse from "@mui/material/Collapse";
-import DashboardIcon from "@mui/icons-material/Dashboard"; // Dashboard Overview
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
+import DashboardIcon from "@mui/icons-material/Dashboard";
 import StoreIcon from "@mui/icons-material/Store";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer"; // Icon cho Voucher
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import GavelIcon from '@mui/icons-material/Gavel';
@@ -134,6 +131,7 @@ export default function AdminDashboardLayout() {
   const location = useLocation();
   const auth = useSelector((state) => state.auth);
   const userRole = auth?.user?.role;
+  const isMonitor = userRole === 'monitor'; // read-only observer role
   const [dashboardTitle, setDashboardTitle] = React.useState("Admin Dashboard");
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
@@ -150,7 +148,7 @@ export default function AdminDashboardLayout() {
     // Gọi song song hai API
     const fetchData = async () => {
       try {
-        const [reportRes, profileRes] = await Promise.all([
+        const [reportRes, profileRes] = await Promise.allSettled([
           axios.get("http://localhost:9999/api/admin/report", {
             headers: { Authorization: `Bearer ${token}` },
           }),
@@ -160,13 +158,13 @@ export default function AdminDashboardLayout() {
         ]);
 
         // Xử lý admin/report
-        if (!reportRes.data.success) {
+        if (reportRes.status === 'fulfilled' && !reportRes.value.data.success) {
           console.warn("Không lấy được báo cáo admin");
         }
 
         // Xử lý profile
-        if (profileRes.data.success && profileRes.data.data) {
-          const profile = profileRes.data.data;
+        if (profileRes.status === 'fulfilled' && profileRes.value.data.success && profileRes.value.data.data) {
+          const profile = profileRes.value.data.data;
           setAdminInfo({
             avatarURL: profile.avatarURL,
             username: profile.username,
@@ -195,8 +193,10 @@ export default function AdminDashboardLayout() {
     setDashboardTitle(newDashboardTitle);
 
   // Check if user can access a specific menu item based on role
+  // Monitor can view ALL tabs but cannot mutate data
   const canAccess = (requiredRoles) => {
     if (!userRole) return false;
+    if (userRole === 'monitor') return true; // monitor sees everything
     return requiredRoles.includes(userRole);
   };
 
@@ -297,40 +297,26 @@ export default function AdminDashboardLayout() {
               {/* User Management - Admin & Support only */}
               {canAccess(['admin', 'support']) && (
                 <>
-                  <ListItemButton onClick={handleToggleAdminMgmt}>
+                  <ListItemButton
+                    onClick={handleOnclickUsers}
+                    selected={currentPath === "/admin/manage-users"}
+                  >
                     <ListItemIcon sx={{ color: "primary.contrastText" }}>
                       <PeopleIcon />
                     </ListItemIcon>
-                    <ListItemText primary="User Management" />
-                    {openAdminMgmt ? <ExpandLess sx={{ color: "primary.contrastText" }} /> : <ExpandMore sx={{ color: "primary.contrastText" }} />}
+                    <ListItemText
+                      primary="Manage Users"
+                      primaryTypographyProps={{
+                        fontWeight: currentPath === "/admin/manage-users" ? 'bold' : 'normal'
+                      }}
+                    />
                   </ListItemButton>
-
-                  <Collapse in={openAdminMgmt} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                      <ListItemButton
-                        sx={{ pl: 4 }}
-                        onClick={handleOnclickUsers}
-                        selected={currentPath === "/admin/manage-users"}
-                      >
-                        <ListItemIcon sx={{ color: "primary.contrastText" }}>
-                          <PeopleIcon />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="Manage Users"
-                          primaryTypographyProps={{
-                            fontWeight: currentPath === "/admin/manage-users" ? 'bold' : 'normal'
-                          }}
-                        />
-                      </ListItemButton>
-                    </List>
-                  </Collapse>
                 </>
               )}
 
-              {/* Manage Stores - Admin & Finance only */}
-              {canAccess(['admin', 'finance']) && (
+              {/* Manage Stores - Admin & Support */}
+              {canAccess(['admin', 'support']) && (
                 <ListItemButton
-                  sx={{ pl: 4, display: 'block' }}
                   onClick={handleOnclickStores}
                   selected={currentPath === "/admin/manage-stores"}
                 >
@@ -400,8 +386,8 @@ export default function AdminDashboardLayout() {
                 </ListItemButton>
               )}
 
-              {/* Manage Vouchers - Admin & Support & Finance */}
-              {canAccess(['admin', 'support', 'finance']) && (
+              {/* Manage Vouchers - Admin & Finance */}
+              {canAccess(['admin', 'finance']) && (
                 <ListItemButton
                   onClick={handleOnclickVouchers}
                   selected={currentPath === "/admin/manage-vouchers"}
@@ -418,8 +404,8 @@ export default function AdminDashboardLayout() {
                 </ListItemButton>
               )}
 
-              {/* Manage Orders - Admin only */}
-              {canAccess(['admin']) && (
+              {/* Manage Orders - Admin & Finance */}
+              {canAccess(['admin', 'finance']) && (
                 <ListItemButton
                   onClick={handleOnclickOrders}
                   selected={currentPath === "/admin/manage-orders"}
@@ -468,12 +454,12 @@ export default function AdminDashboardLayout() {
                 mb: 3,
               }}
             >
-              <Outlet context={{ handleSetDashboardTitle }} />
+              <Outlet context={{ handleSetDashboardTitle, isMonitor }} />
             </Paper>
             <Copyright sx={{ pt: 4 }} />
           </Container>
         </Box>
       </Box>
-    </ThemeProvider>
+    </ThemeProvider >
   );
 }

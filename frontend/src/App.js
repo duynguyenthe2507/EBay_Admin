@@ -67,6 +67,7 @@ import LockedAccount from "./pages/LockedAccount";
 import PendingAccount from "./pages/PendingAccount";
 import ManageReviews from "./pages/DashboardAdmin/ManageReview/ManageReviews";
 import ManageDisputes from "./pages/DashboardAdmin/ManageDispute/ManageDisputes";
+import SendEmail from "./pages/DashboardAdmin/ManageUser/SendEmail";
 
 
 const Layout = () => {
@@ -129,52 +130,59 @@ const router = createBrowserRouter(
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Products - Admin only */}
+        {/* Manage Products - Admin & Monitor */}
         <Route path="/admin/manage-products" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MONITOR]}>
             <ManageProductA />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Users - Admin & Support only */}
+        {/* Manage Users - Admin, Support & Monitor */}
         <Route path="/admin/manage-users" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT, ROLES.MONITOR]}>
             <ManageUser />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Stores - Admin & Finance only */}
+        {/* Manage Stores - Admin, Support & Monitor */}
         <Route path="/admin/manage-stores" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.FINANCE]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT, ROLES.MONITOR]}>
             <ManageStore />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Vouchers - Admin & Support & Finance */}
+        {/* Manage Vouchers - Admin, Finance & Monitor */}
         <Route path="/admin/manage-vouchers" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT, ROLES.FINANCE]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.FINANCE, ROLES.MONITOR]}>
             <ManageVoucher />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Orders - Admin only */}
+        {/* Manage Orders - Admin, Finance & Monitor */}
         <Route path="/admin/manage-orders" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.FINANCE, ROLES.MONITOR]}>
             <ManageOrderAdmin />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Reviews - Admin & Support */}
+        {/* Manage Reviews - Admin, Support & Monitor */}
         <Route path="/admin/manage-reviews" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT, ROLES.MONITOR]}>
             <ManageReviews />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Disputes - Admin & Support */}
+        {/* Manage Disputes - Admin, Support & Monitor */}
         <Route path="/admin/manage-disputes" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT, ROLES.MONITOR]}>
             <ManageDisputes />
+          </ProtectedRoute>
+        }></Route>
+
+        {/* Send Email - Admin & Support */}
+        <Route path="/admin/send-email" element={
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT]}>
+            <SendEmail />
           </ProtectedRoute>
         }></Route>
       </Route>

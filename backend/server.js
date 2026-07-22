@@ -7,6 +7,7 @@ const { initScheduler } = require("./src/config/scheduler");
 const http = require("http");
 const { initSocketServer } = require("./src/services/socketService");
 const cookieParser = require('cookie-parser');
+const { generalLimiter } = require('./src/middleware/rateLimiter');
 
 const app = express();
 dotenv.config(); // Move dotenv.config() before using process.env
@@ -76,6 +77,8 @@ connect(MONGO_URI, { dbName: 'ebay_admin' })
     process.exit(1);
   });
 
+// Apply global rate limiter to all API routes (100 req/min per IP)
+app.use("/api", generalLimiter);
 app.use("/api", router);
 
 // Health check endpoint for Render
@@ -115,6 +118,7 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running at PORT ${PORT}`);
   console.log(`WebSocket server is running`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log('System is running with admin account sysadmin@gmail.com/123456');
 
   // Initialize schedulers after server starts
   initScheduler();
