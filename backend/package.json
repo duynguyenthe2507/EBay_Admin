@@ -27,6 +27,7 @@
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
+    "ebay-admin": "file:..",
     "express": "^4.18.2",
     "express-rate-limit": "^8.6.0",
     "express-validator": "^7.2.1",

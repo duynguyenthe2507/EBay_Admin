@@ -16,6 +16,8 @@ const Dispute = require("./Dispute");
 const Store = require("./Store");
 const Message = require("./Message");
 const Conversation = require("./Conversation");
+const Cart = require("./Cart");
+const Voucher = require("./Voucher");
 
 module.exports = {
   User,
@@ -36,4 +38,6 @@ module.exports = {
   Store,
   Message,
   Conversation,
+  Cart,
+  Voucher,
 };
