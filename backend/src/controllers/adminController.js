@@ -2101,3 +2101,41 @@ exports.sendAdminEmail = async (req, res) => {
     handleError(res, error, 'Lỗi gửi email', 500);
   }
 }
+
+/**
+ * @desc Switch role for admin profile
+ * @route PUT /api/admin/switch-role
+ * @access Private
+ */
+exports.switchRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+    const jwt = require("jsonwebtoken");
+
+    const allowedRoles = ['admin', 'monitor', 'finance', 'support'];
+    if (!allowedRoles.includes(role)) {
+      return res.status(400).json({ success: false, message: 'Invalid role' });
+    }
+
+    const user = await User.findById(req.user.id || req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    user.role = role;
+    await user.save();
+
+    // Generate new token
+    const token = jwt.sign(
+      { id: user._id, role: user.role, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    res.json({ success: true, message: 'Role switched successfully', role, token });
+  } catch (err) {
+    const fs = require('fs');
+    fs.writeFileSync('error_log.txt', err.stack || err.message);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

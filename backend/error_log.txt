@@ -1,0 +1,5 @@
+ValidationError: User validation failed: action: `active` is not a valid enum value for path `action`.
+    at Document.invalidate (D:\baokhanh\study 2024\SUM2026\SDN302\Project\EBay_Admin\backend\node_modules\mongoose\lib\document.js:3228:32)
+    at D:\baokhanh\study 2024\SUM2026\SDN302\Project\EBay_Admin\backend\node_modules\mongoose\lib\document.js:3021:17
+    at D:\baokhanh\study 2024\SUM2026\SDN302\Project\EBay_Admin\backend\node_modules\mongoose\lib\schematype.js:1368:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
