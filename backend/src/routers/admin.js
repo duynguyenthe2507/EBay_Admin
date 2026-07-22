@@ -69,6 +69,9 @@ const {
   createAdminUser,
   updateUserRole,
 
+  // Admin AuditLog
+  getAuditLogs,
+  
   // Email
   sendAdminEmail,
 } = require("../controllers/adminController");
@@ -138,5 +141,8 @@ router.get('/vouchers/:id', authorize(PERMISSIONS.MANAGE_VOUCHERS), getVoucherBy
 router.put('/vouchers/:id', authorize(PERMISSIONS.MANAGE_VOUCHERS), updateVoucher);
 router.delete('/vouchers/:id', authorize(PERMISSIONS.MANAGE_VOUCHERS), deleteVoucher);
 router.put('/vouchers/:id/toggle-active', authorize(PERMISSIONS.MANAGE_VOUCHERS), toggleVoucherActive);
+
+// Manage AuditLog Routes
+router.get('/audit-logs', authorize(PERMISSIONS.VIEW_REPORTS), getAuditLogs)
 
 module.exports = router;

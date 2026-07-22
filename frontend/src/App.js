@@ -67,6 +67,7 @@ import LockedAccount from "./pages/LockedAccount";
 import PendingAccount from "./pages/PendingAccount";
 import ManageReviews from "./pages/DashboardAdmin/ManageReview/ManageReviews";
 import ManageDisputes from "./pages/DashboardAdmin/ManageDispute/ManageDisputes";
+import ManageAuditLogs from "./pages/DashboardAdmin/ManageAuditLog/ManageAuditLogs.js";
 import SendEmail from "./pages/DashboardAdmin/ManageUser/SendEmail";
 
 
@@ -179,6 +180,15 @@ const router = createBrowserRouter(
           </ProtectedRoute>
         }></Route>
 
+        {/* Audit Logs - Admin only */}
+        <Route
+          path="/admin/audit-logs"
+          element={
+            <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+              <ManageAuditLogs />
+            </ProtectedRoute>
+          }
+        />
         {/* Send Email - Admin & Support */}
         <Route path="/admin/send-email" element={
           <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT]}>

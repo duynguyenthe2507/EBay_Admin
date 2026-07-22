@@ -29,6 +29,7 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import GavelIcon from '@mui/icons-material/Gavel';
+import SecurityIcon from "@mui/icons-material/Security";
 
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -217,6 +218,10 @@ export default function AdminDashboardLayout() {
   };
   const handleOnclickOrders = () => {
     navigate("/admin/manage-orders");
+  };
+
+  const handleOnclickAuditLogs = () => {
+    navigate("/admin/audit-logs");
   };
 
   const handleOnclickSignout = async () => {
@@ -417,6 +422,28 @@ export default function AdminDashboardLayout() {
                     primary="Order Management"
                     primaryTypographyProps={{
                       fontWeight: currentPath === "/admin/manage-orders" ? 'bold' : 'normal'
+                    }}
+                  />
+                </ListItemButton>
+              )}
+
+              {/* Audit Logs */}
+              {canAccess(['admin']) && (
+                <ListItemButton
+                  onClick={handleOnclickAuditLogs}
+                  selected={currentPath === "/admin/audit-logs"}
+                >
+                  <ListItemIcon sx={{ color: "primary.contrastText" }}>
+                    <SecurityIcon />
+                  </ListItemIcon>
+
+                  <ListItemText
+                    primary="Audit Logs"
+                    primaryTypographyProps={{
+                      fontWeight:
+                        currentPath === "/admin/audit-logs"
+                          ? "bold"
+                          : "normal",
                     }}
                   />
                 </ListItemButton>

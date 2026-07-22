@@ -22,6 +22,10 @@ const { sendEmail } = require("../utils/email");
 const logger = require("../utils/logger");
 const mongoose = require("mongoose");
 
+const AuditLog = require("../models/AuditLog");
+const AUDIT = require("../constants/auditActions");
+const { createAuditLog } = require("../services/auditLogService");
+
 // --- Hàm Hỗ Trợ Xử Lý Lỗi (Helper Function for Error Responses) ---
 // Hàm này giúp chuẩn hóa việc xử lý và phản hồi lỗi.
 const handleError = (res, error, message = "Lỗi Máy Chủ", statusCode = 500) => {
@@ -173,6 +177,18 @@ exports.deleteUserByAdmin = async (req, res) => {
         .json({ success: false, message: "Người dùng không tồn tại" });
     }
     await User.findByIdAndDelete(userId);
+
+    // Ghi Audit Log
+    await createAuditLog({
+      admin: req.user.id,
+      action: AUDIT.USER_DELETE,
+      targetType: "USER",
+      targetId: user._id,
+      description: `Delete user ${user.email}`,
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
+
     res
       .status(200)
       .json({ success: true, message: "Xóa người dùng thành công" });
@@ -263,56 +279,81 @@ exports.approveUser = async (req, res) => {
  * @access Riêng tư (Admin)
  */
 exports.updateUserByAdmin = async (req, res) => {
+  const { createAuditLog } = require("../services/auditLogService");
   const { userId } = req.params;
   const { role, action, username, email } = req.body;
 
   try {
     const user = await User.findById(userId);
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Người dùng không tồn tại" });
+      return res.status(404).json({
+        success: false,
+        message: "Người dùng không tồn tại",
+      });
     }
 
-    const previousAction = user.action; // Lưu trạng thái trước để kiểm tra thay đổi
+    const previousAction = user.action;
+
+    // Mặc định nếu chỉ sửa username, email, role... thì log là USER_UPDATE
+    let auditAction = AUDIT.USER_UPDATE;
+    let auditDescription = `Cập nhật thông tin người dùng ${user.username}`;
 
     if (username) user.username = username;
     if (email) user.email = email;
     if (role && ["buyer", "seller", "admin"].includes(role)) {
       user.role = role;
     }
+
+    // Xử lý khi có gửi field `action`
     if (action && ["lock", "unlock"].includes(action)) {
       user.action = action;
-      // Nếu lock seller, reject store nếu tồn tại
-      if (action === "lock" && user.role === "seller") {
-        const store = await Store.findOne({ sellerId: user._id });
-        if (store) {
-          store.status = "rejected";
-          await store.save();
-          // Gửi email thông báo store bị rejected
-          await sendEmail(
-            user.email,
-            "Cửa hàng của bạn đã bị từ chối",
-            `Kính gửi ${user.username},\n\nCửa hàng của bạn (${store.storeName}) đã bị từ chối do tài khoản của bạn bị khóa. Vui lòng liên hệ hỗ trợ để biết thêm chi tiết.\n\nTrân trọng,\nShopii Team`
-          );
+
+      if (action === "lock") {
+        auditAction = AUDIT.USER_LOCK;
+        auditDescription = `Khóa người dùng ${user.username}`;
+
+        if (user.role === "seller") {
+          const store = await Store.findOne({ sellerId: user._id });
+          if (store) {
+            store.status = "rejected";
+            await store.save();
+
+            await sendEmail(
+              user.email,
+              "Cửa hàng của bạn đã bị từ chối",
+              `Kính gửi ${user.username}, ...`
+            );
+          }
         }
+      } else if (action === "unlock") {
+        auditAction = AUDIT.USER_UNLOCK;
+        auditDescription = `Mở khóa người dùng ${user.username}`;
+      }
+
+      // Chỉ gửi Email khi thực sự có sự thay đổi trạng thái Lock <-> Unlock
+      if (action !== previousAction) {
+        const emailSubject =
+          action === "lock"
+            ? "Tài khoản của bạn đã bị khóa"
+            : "Tài khoản của bạn đã được mở khóa";
+
+        await sendEmail(user.email, emailSubject, `Kính gửi ${user.username}, ...`);
       }
     }
 
-    // Gửi email nếu action thay đổi
-    if (action && action !== previousAction) {
-      const emailSubject =
-        action === "lock"
-          ? "Tài khoản của bạn đã bị khóa"
-          : "Tài khoản của bạn đã được mở khóa";
-      const emailText =
-        action === "lock"
-          ? `Kính gửi ${user.username},\n\nTài khoản của bạn đã bị khóa bởi quản trị viên. Vui lòng liên hệ hỗ trợ để biết thêm chi tiết.\n\nTrân trọng,\nShopii Team`
-          : `Kính gửi ${user.username},\n\nTài khoản của bạn đã được mở khóa. Bạn có thể tiếp tục sử dụng dịch vụ của chúng tôi.\n\nTrân trọng,\nShopii Team`;
-      await sendEmail(user.email, emailSubject, emailText);
-    }
-
     await user.save();
+
+    // ===== Ghi Audit Log với đúng hành động =====
+    await createAuditLog({
+      admin: req.user.id,
+      action: auditAction, // Sẽ ra "USER_LOCK", "USER_UNLOCK" hoặc "USER_UPDATE"
+      targetType: "User",
+      targetId: user._id,
+      description: auditDescription,
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
+
     const userToReturn = user.toObject();
     delete userToReturn.password;
 
@@ -322,7 +363,7 @@ exports.updateUserByAdmin = async (req, res) => {
       data: userToReturn,
     });
   } catch (error) {
-    if (error.code === 11000 && error.keyPattern && error.keyPattern.email) {
+    if (error.code === 11000 && error.keyPattern?.email) {
       return handleError(res, error, "Email đã được sử dụng.", 400);
     }
     handleError(res, error, "Lỗi khi cập nhật người dùng");
@@ -419,67 +460,106 @@ exports.updateStoreStatusByAdmin = async (req, res) => {
 
   try {
     const store = await Store.findById(storeId);
+
     if (!store) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Cửa hàng không tồn tại" });
+      return res.status(404).json({
+        success: false,
+        message: "Cửa hàng không tồn tại",
+      });
     }
 
-    const previousStatus = store.status; // Lưu trạng thái trước để kiểm tra thay đổi
+    const previousStatus = store.status;
 
-    if (status === "approved" && store.sellerId) {
-      const seller = await User.findById(store.sellerId);
-      if (!seller) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Người dùng không tồn tại" });
+    let auditAction = AUDIT.STORE_UPDATE;
+
+    if (status === "approved") {
+      auditAction = AUDIT.STORE_APPROVE;
+
+      if (store.sellerId) {
+        const seller = await User.findById(store.sellerId);
+
+        if (!seller) {
+          return res.status(404).json({
+            success: false,
+            message: "Người dùng không tồn tại",
+          });
+        }
+
+        if (seller.action === "lock") {
+          return res.status(400).json({
+            success: false,
+            message: "Không thể duyệt cửa hàng khi người dùng bị khóa",
+          });
+        }
+
+        if (seller.role === "buyer") {
+          seller.role = "seller";
+          await seller.save();
+        }
       }
-      if (seller.action === "lock") {
-        return res.status(400).json({
-          success: false,
-          message: "Không thể duyệt cửa hàng khi người dùng bị khóa",
-        });
-      }
-      if (seller.role === "buyer") {
-        seller.role = "seller";
-        await seller.save();
-      }
+    } else if (status === "rejected") {
+      auditAction = AUDIT.STORE_REJECT;
     }
 
     store.status = status;
     await store.save();
 
-    // Gửi email nếu status thay đổi
+    await createAuditLog({
+      admin: req.user.id,
+      action: auditAction,
+      targetType: "Store",
+      targetId: store._id,
+      description: `Updated store "${store.storeName}" (status: ${previousStatus} → ${status})`,
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
+
     if (status !== previousStatus) {
       const seller = await User.findById(store.sellerId);
+
       if (seller) {
-        let emailSubject, emailText;
+        let emailSubject;
+        let emailText;
+
         switch (status) {
           case "approved":
             emailSubject = "Cửa hàng của bạn đã được duyệt";
-            emailText = `Kính gửi ${seller.username},\n\nCửa hàng của bạn (${store.storeName}) đã được duyệt thành công. Bạn có thể bắt đầu bán hàng ngay bây giờ!\n\nTrân trọng,\nShopii Team`;
+            emailText = `Kính gửi ${seller.username},
+
+Cửa hàng "${store.storeName}" đã được duyệt.
+
+Trân trọng,
+Shopii Team`;
             break;
+
           case "rejected":
             emailSubject = "Cửa hàng của bạn đã bị từ chối";
-            emailText = `Kính gửi ${seller.username},\n\nCửa hàng của bạn (${store.storeName}) đã bị từ chối. Vui lòng liên hệ hỗ trợ để biết thêm chi tiết.\n\nTrân trọng,\nShopii Team`;
+            emailText = `Kính gửi ${seller.username},
+
+Cửa hàng "${store.storeName}" đã bị từ chối.
+
+Trân trọng,
+Shopii Team`;
             break;
+
           case "pending":
-            emailSubject = "Cửa hàng của bạn đang chờ duyệt";
-            emailText = `Kính gửi ${seller.username},\n\nCửa hàng của bạn (${store.storeName}) hiện đang trong trạng thái chờ duyệt. Chúng tôi sẽ thông báo khi có cập nhật mới.\n\nTrân trọng,\nShopii Team`;
+            emailSubject = "Cửa hàng đang chờ duyệt";
+            emailText = `Kính gửi ${seller.username},
+
+Cửa hàng "${store.storeName}" đang ở trạng thái chờ duyệt.
+
+Trân trọng,
+Shopii Team`;
             break;
         }
+
         await sendEmail(seller.email, emailSubject, emailText);
       }
     }
 
     res.status(200).json({
       success: true,
-      message: `Cửa hàng đã được ${status === "approved"
-        ? "duyệt"
-        : status === "rejected"
-          ? "từ chối"
-          : "chuyển sang chờ duyệt"
-        } thành công`,
+      message: `Cập nhật trạng thái cửa hàng thành công`,
       data: store,
     });
   } catch (error) {
@@ -493,6 +573,7 @@ exports.updateStoreStatusByAdmin = async (req, res) => {
  */
 exports.updateStoreByAdmin = async (req, res) => {
   const { storeId } = req.params;
+
   const {
     storeName,
     description,
@@ -504,29 +585,75 @@ exports.updateStoreByAdmin = async (req, res) => {
 
   try {
     const store = await Store.findById(storeId);
+
     if (!store) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Cửa hàng không tồn tại" });
+      return res.status(404).json({
+        success: false,
+        message: "Cửa hàng không tồn tại",
+      });
     }
 
-    if (storeName) store.storeName = storeName;
-    if (description) store.description = description;
-    if (bannerImageURL) store.bannerImageURL = bannerImageURL;
-    if (status && ["pending", "approved", "rejected"].includes(status)) {
+    const changes = [];
+
+    if (storeName && storeName !== store.storeName) {
+      changes.push(`storeName: "${store.storeName}" → "${storeName}"`);
+      store.storeName = storeName;
+    }
+
+    if (description && description !== store.description) {
+      changes.push("description updated");
+      store.description = description;
+    }
+
+    if (bannerImageURL && bannerImageURL !== store.bannerImageURL) {
+      changes.push("banner updated");
+      store.bannerImageURL = bannerImageURL;
+    }
+
+    if (address && address !== store.address) {
+      changes.push("address updated");
+      store.address = address;
+    }
+
+    if (contactInfo && contactInfo !== store.contactInfo) {
+      changes.push("contact info updated");
+      store.contactInfo = contactInfo;
+    }
+
+    if (
+      status &&
+      ["pending", "approved", "rejected"].includes(status) &&
+      status !== store.status
+    ) {
+      changes.push(`status: ${store.status} → ${status}`);
+
       if (status === "approved" && store.sellerId) {
         const seller = await User.findById(store.sellerId);
-        if (seller && seller.role === "user") {
+
+        if (seller && seller.role === "buyer") {
           seller.role = "seller";
           await seller.save();
         }
       }
+
       store.status = status;
     }
-    if (address) store.address = address;
-    if (contactInfo) store.contactInfo = contactInfo;
 
     await store.save();
+
+    await createAuditLog({
+      admin: req.user.id,
+      action: AUDIT.STORE_UPDATE,
+      targetType: "Store",
+      targetId: store._id,
+      description:
+        changes.length > 0
+          ? `Updated store "${store.storeName}". ${changes.join(", ")}`
+          : `Updated store "${store.storeName}"`,
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
+
     res.status(200).json({
       success: true,
       message: "Cập nhật cửa hàng thành công",
@@ -599,28 +726,64 @@ exports.getProductDetailsAdmin = async (req, res) => {
  */
 exports.updateProductStatusAdmin = async (req, res) => {
   const { id } = req.params;
-  const { title, description, price, isAuction, status } = req.body;
+  const { title, description, price, status } = req.body;
 
   try {
     const product = await Product.findById(id);
+
     if (!product) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Sản phẩm không tồn tại" });
+      return res.status(404).json({
+        success: false,
+        message: "Sản phẩm không tồn tại",
+      });
     }
 
-    // Update product fields if provided
-    if (title !== undefined) product.title = title;
-    if (description !== undefined) product.description = description;
-    if (price !== undefined) product.price = price;
-    if (isAuction !== undefined) product.isAuction = isAuction;
+    const changes = [];
 
-    // Only update status if it's provided and valid
-    if (status && ["available", "out_of_stock", "pending"].includes(status)) {
+    if (title !== undefined && title !== product.title) {
+      changes.push(`title: "${product.title}" → "${title}"`);
+      product.title = title;
+    }
+
+    if (
+      description !== undefined &&
+      description !== product.description
+    ) {
+      changes.push("description updated");
+      product.description = description;
+    }
+
+    if (
+      price !== undefined &&
+      Number(price) !== Number(product.price)
+    ) {
+      changes.push(`price: ${product.price} → ${price}`);
+      product.price = price;
+    }
+
+    if (
+      status &&
+      ["available", "out_of_stock", "pending"].includes(status) &&
+      status !== product.status
+    ) {
+      changes.push(`status: ${product.status} → ${status}`);
       product.status = status;
     }
 
     await product.save();
+
+    await createAuditLog({
+      admin: req.user.id,
+      action: AUDIT.PRODUCT_UPDATE,
+      targetType: "Product",
+      targetId: product._id,
+      description:
+        changes.length > 0
+          ? `Updated product "${product.title}". ${changes.join(", ")}`
+          : `Updated product "${product.title}"`,
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
 
     res.status(200).json({
       success: true,
@@ -640,6 +803,15 @@ exports.updateProductStatusAdmin = async (req, res) => {
 exports.deleteProductAdmin = async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
+    await createAuditLog({
+      admin: req.user.id,
+      action: AUDIT.PRODUCT_DELETE,
+      targetType: "Product",
+      targetId: product._id,
+      description: `Deleted product "${product.title}"`,
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
     if (!product) {
       return res
         .status(404)
@@ -1097,7 +1269,7 @@ exports.getAllDisputesAdmin = async (req, res) => {
       // find users matching username
       const users = await User.find({ username: { $regex: regex } }).select('_id');
       const userIds = users.map(u => u._id);
-      const orClauses = [ { description: { $regex: regex } } ];
+      const orClauses = [{ description: { $regex: regex } }];
       if (userIds.length) orClauses.push({ raisedBy: { $in: userIds } });
       // if search looks like an ObjectId, include orderItemId match
       if (mongoose.Types.ObjectId.isValid(search)) {
@@ -1246,130 +1418,6 @@ exports.getProductReviewsAndStats = async (req, res) => {
     handleError(res, error, "Lỗi khi lấy đánh giá sản phẩm");
   }
 };
-
-// // --- Quản Lý Danh Mục (Category Management) ---
-
-// /**
-//  * @desc Tạo một danh mục mới
-//  * @route POST /api/admin/categories
-//  * @access Riêng tư (Admin)
-//  */
-// exports.createCategoryAdmin = async (req, res) => {
-//   const { name } = req.body; // Lấy tên danh mục từ request body
-//   if (!name) {
-//     return res
-//       .status(400)
-//       .json({ success: false, message: "Tên danh mục là bắt buộc" });
-//   }
-//   try {
-//     // Kiểm tra xem danh mục đã tồn tại chưa (dựa trên trường 'name' là unique)
-//     const existingCategory = await Category.findOne({ name });
-//     if (existingCategory) {
-//       return res
-//         .status(400)
-//         .json({ success: false, message: "Danh mục với tên này đã tồn tại" });
-//     }
-//     const category = await Category.create({ name }); // Tạo danh mục mới
-//     res.status(201).json({
-//       success: true,
-//       message: "Tạo danh mục thành công",
-//       data: category,
-//     });
-//   } catch (error) {
-//     handleError(res, error, "Lỗi khi tạo danh mục");
-//   }
-// };
-
-// /**
-//  * @desc Lấy tất cả danh mục
-//  * @route GET /api/admin/categories
-//  * @access Riêng tư (Admin) hoặc Công khai (tùy theo yêu cầu)
-//  */
-// exports.getCategoriesAdmin = async (req, res) => {
-//   try {
-//     const categories = await Category.find(); // Lấy tất cả danh mục
-//     res
-//       .status(200)
-//       .json({ success: true, count: categories.length, data: categories });
-//   } catch (error) {
-//     handleError(res, error, "Lỗi khi lấy danh sách danh mục");
-//   }
-// };
-
-// /**
-//  * @desc Cập nhật một danh mục
-//  * @route PUT /api/admin/categories/:categoryId
-//  * @access Riêng tư (Admin)
-//  */
-// exports.updateCategoryAdmin = async (req, res) => {
-//   const { categoryId } = req.params; // Lấy ID danh mục
-//   const { name } = req.body; // Lấy tên mới
-//   if (!name) {
-//     return res.status(400).json({
-//       success: false,
-//       message: "Tên danh mục là bắt buộc để cập nhật",
-//     });
-//   }
-//   try {
-//     // Tìm và cập nhật danh mục, trả về bản ghi mới (new: true), chạy validators (runValidators: true)
-//     const category = await Category.findByIdAndUpdate(
-//       categoryId,
-//       { name },
-//       { new: true, runValidators: true }
-//     );
-//     if (!category) {
-//       return res
-//         .status(404)
-//         .json({ success: false, message: "Danh mục không tồn tại" });
-//     }
-//     res.status(200).json({
-//       success: true,
-//       message: "Cập nhật danh mục thành công",
-//       data: category,
-//     });
-//   } catch (error) {
-//     if (error.code === 11000) {
-//       // Xử lý lỗi trùng tên
-//       return handleError(res, error, "Danh mục với tên này đã tồn tại.", 400);
-//     }
-//     handleError(res, error, "Lỗi khi cập nhật danh mục");
-//   }
-// };
-
-// /**
-//  * @desc Xóa một danh mục
-//  * @route DELETE /api/admin/categories/:categoryId
-//  * @access Riêng tư (Admin)
-//  */
-// exports.deleteCategoryAdmin = async (req, res) => {
-//   const { categoryId } = req.params;
-//   try {
-//     const category = await Category.findById(categoryId);
-//     if (!category) {
-//       return res
-//         .status(404)
-//         .json({ success: false, message: "Danh mục không tồn tại" });
-//     }
-//     // TODO: Cân nhắc điều gì xảy ra với các sản phẩm thuộc danh mục này.
-//     // Option 1: Không cho phép xóa nếu có sản phẩm tồn tại. (Đã triển khai)
-//     // Option 2: Đặt category của sản phẩm thành null hoặc một danh mục mặc định.
-//     // Option 3: Xóa luôn các sản phẩm đó (nguy hiểm).
-//     const productsInCategory = await Product.countDocuments({
-//       categoryId: categoryId,
-//     });
-//     if (productsInCategory > 0) {
-//       return res.status(400).json({
-//         success: false,
-//         message: `Không thể xóa danh mục. Có ${productsInCategory} sản phẩm đang liên kết với danh mục này.`,
-//       });
-//     }
-
-//     await Category.findByIdAndDelete(categoryId); // Xóa danh mục
-//     res.status(200).json({ success: true, message: "Xóa danh mục thành công" });
-//   } catch (error) {
-//     handleError(res, error, "Lỗi khi xóa danh mục");
-//   }
-// };
 
 exports.getAdminReport = async (req, res) => {
   const { period } = req.query;
@@ -1942,6 +1990,27 @@ exports.updateUserRole = async (req, res) => {
   }
 };
 
+exports.getAuditLogs = async (req, res) => {
+  try {
+
+    const logs = await AuditLog.find()
+      .populate("admin", "fullname email")
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: logs,
+    });
+
+  } catch (err) {
+
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+}
+
 /**
  * @desc Send email to users (all, all admins, or specific users). Supports scheduled send.
  * @route POST /api/admin/send-email
@@ -2031,4 +2100,4 @@ exports.sendAdminEmail = async (req, res) => {
   } catch (error) {
     handleError(res, error, 'Lỗi gửi email', 500);
   }
-};
+}
