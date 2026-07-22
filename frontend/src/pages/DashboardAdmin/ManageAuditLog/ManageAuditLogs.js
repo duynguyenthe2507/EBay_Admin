@@ -47,31 +47,88 @@ export default function ManageAuditLogs() {
 
     const getActionColor = (action) => {
         switch (action) {
-            case "USER_LOCK":
-            case "SHOP_REJECT":
-            case "PRODUCT_DELETE":
-            case "CATEGORY_DELETE":
-                return "error";
-
+            // User
+            case "USER_CREATE":
             case "USER_UNLOCK":
-            case "SHOP_APPROVE":
-            case "PRODUCT_CREATE":
-            case "CATEGORY_CREATE":
+            case "USER_APPROVE":
                 return "success";
 
+            case "USER_LOCK":
+            case "USER_REJECT":
+            case "USER_DELETE":
+                return "error";
+
             case "USER_UPDATE":
-            case "PRODUCT_UPDATE":
-            case "CATEGORY_UPDATE":
+            case "USER_CHANGE_ROLE":
                 return "warning";
 
+            // Store
+            case "STORE_APPROVE":
+                return "success";
+
+            case "STORE_REJECT":
+            case "STORE_DELETE":
+                return "error";
+
+            case "STORE_UPDATE":
+                return "warning";
+
+            // Product
+            case "PRODUCT_CREATE":
+                return "success";
+
+            case "PRODUCT_DELETE":
+                return "error";
+
+            case "PRODUCT_UPDATE":
+            case "PRODUCT_STATUS_CHANGE":
+                return "warning";
+
+            // Coupon
+            case "COUPON_CREATE":
+                return "success";
+
+            case "COUPON_DELETE":
+                return "error";
+
+            case "COUPON_UPDATE":
+                return "warning";
+
+            // Order
+            case "ORDER_CREATE":
+                return "success";
+
+            case "ORDER_STATUS_UPDATE":
+                return "info";
+
+            case "ORDER_CANCEL":
+                return "error";
+
+            // Review
+            case "REVIEW_DELETE":
+                return "error";
+
+            // Dispute
+            case "DISPUTE_UPDATE":
+                return "warning";
+
+            case "DISPUTE_CLOSE":
+                return "success";
+
+            // Admin
             case "ADMIN_LOGIN":
                 return "primary";
+
+            case "ADMIN_LOGOUT":
+                return "secondary";
+
+            case "ADMIN_CREATE":
+                return "success";
 
             default:
                 return "default";
         }
     };
-
 
     return (
         <Box>
@@ -213,13 +270,10 @@ export default function ManageAuditLogs() {
                                                     {log.ip}
                                                 </Typography>
                                             </TableCell>
-
                                         </TableRow>
                                     ))
                                 )}
-
                             </TableBody>
-
                         </Table>
                     </TableContainer>
                 )}
