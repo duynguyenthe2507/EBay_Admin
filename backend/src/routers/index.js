@@ -11,24 +11,25 @@ const chatRouter = require("./chatRouter");
 const userController = require("../controllers/userController");
 const imageRoutes = require("../routes/imageRoutes");
 const { authMiddleware } = require("../middleware/auth.middleware");
+const { authLimiter, sensitiveActionLimiter } = require('../middleware/rateLimiter');
 
 // Admin 2FA routes MUST be registered before mounting /admin router
-router.post('/admin/2fa/setup', authMiddleware, authController.setupAdmin2FA);
-router.post('/admin/2fa/verify', authController.verifyAdmin2FA);
+router.post('/admin/2fa/setup', authMiddleware, authLimiter, authController.setupAdmin2FA);
+router.post('/admin/2fa/verify', authLimiter, authController.verifyAdmin2FA);
 
 router.use("/admin", adminRouter);
 router.use("/seller", sellerRouter);
 
 // Routes cho đăng ký và đăng nhập
-router.post("/register", authController.register);
-router.post("/login", authController.login);
-router.post("/forgot-password", authController.forgotPassword);
+router.post("/register", authLimiter, authController.register);
+router.post("/login", authLimiter, authController.login);
+router.post("/forgot-password", authLimiter, authController.forgotPassword);
 
 
 // User profile routes
 router.get("/profile", authMiddleware, authController.getProfile);
 router.put("/profile", authMiddleware, authController.updateProfile);
-router.put("/profile/password", authMiddleware, authController.updatePassword);
+router.put("/profile/password", authMiddleware, sensitiveActionLimiter, authController.updatePassword);
 
 // User search routes
 router.get("/users/search", authMiddleware, userController.searchUsers);

@@ -7,6 +7,7 @@ const { initScheduler } = require("./src/config/scheduler");
 const http = require("http");
 const { initSocketServer } = require("./src/services/socketService");
 const cookieParser = require('cookie-parser');
+const { generalLimiter } = require('./src/middleware/rateLimiter');
 
 const app = express();
 dotenv.config(); // Move dotenv.config() before using process.env
@@ -76,6 +77,8 @@ connect(MONGO_URI, { dbName: 'ebay_admin' })
     process.exit(1);
   });
 
+// Apply global rate limiter to all API routes (100 req/min per IP)
+app.use("/api", generalLimiter);
 app.use("/api", router);
 
 // Health check endpoint for Render

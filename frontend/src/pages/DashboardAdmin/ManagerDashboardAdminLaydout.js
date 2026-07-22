@@ -22,13 +22,10 @@ import AuthenService from "../../services/api/AuthenService";
 import { resetUserInfo } from "../../redux/slices/orebi.slice";
 import { useDispatch } from "react-redux";
 import PeopleIcon from "@mui/icons-material/People";
-import Collapse from "@mui/material/Collapse";
-import DashboardIcon from "@mui/icons-material/Dashboard"; // Dashboard Overview
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
+import DashboardIcon from "@mui/icons-material/Dashboard";
 import StoreIcon from "@mui/icons-material/Store";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer"; // Icon cho Voucher
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import GavelIcon from '@mui/icons-material/Gavel';
@@ -152,7 +149,7 @@ export default function AdminDashboardLayout() {
     // Gọi song song hai API
     const fetchData = async () => {
       try {
-        const [reportRes, profileRes] = await Promise.all([
+        const [reportRes, profileRes] = await Promise.allSettled([
           axios.get("http://localhost:9999/api/admin/report", {
             headers: { Authorization: `Bearer ${token}` },
           }),
@@ -162,13 +159,13 @@ export default function AdminDashboardLayout() {
         ]);
 
         // Xử lý admin/report
-        if (!reportRes.data.success) {
+        if (reportRes.status === 'fulfilled' && !reportRes.value.data.success) {
           console.warn("Không lấy được báo cáo admin");
         }
 
         // Xử lý profile
-        if (profileRes.data.success && profileRes.data.data) {
-          const profile = profileRes.data.data;
+        if (profileRes.status === 'fulfilled' && profileRes.value.data.success && profileRes.value.data.data) {
+          const profile = profileRes.value.data.data;
           setAdminInfo({
             avatarURL: profile.avatarURL,
             username: profile.username,

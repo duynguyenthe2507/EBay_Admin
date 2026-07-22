@@ -16,6 +16,7 @@ const {
   Payment,
   ReturnRequest,
   ShippingInfo,
+  Voucher,
 } = require("../models");
 const { sendEmail } = require("../utils/email");
 const logger = require("../utils/logger");
@@ -1513,6 +1514,8 @@ exports.getAdminReport = async (req, res) => {
       recentActivity,
       activeSellers,
       activeBuyers,
+      usersOverTime,
+      vouchersActive,
     ] = await Promise.all([
       // Order status stats
       Order.aggregate([
@@ -1793,6 +1796,20 @@ exports.getAdminReport = async (req, res) => {
       // Đếm active seller và buyer từ danh sách ID
       User.countDocuments({ role: "seller", _id: { $in: activeSellerIds } }),
       User.countDocuments({ role: "buyer", _id: { $in: activeBuyerIds } }),
+      // Thống kê lượng người dùng đăng ký theo thời gian
+      User.aggregate([
+        { $match: dateFilter },
+        {
+          $group: {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+        { $project: { date: "$_id", count: 1, _id: 0 } },
+      ]),
+      // Thống kê số lượng voucher đang hoạt động
+      Voucher.countDocuments({ ...dateFilter, isActive: true }),
     ]);
 
     const orderStatus = {
@@ -1843,11 +1860,15 @@ exports.getAdminReport = async (req, res) => {
       trends: {
         revenueOverTime,
         orderOverTime,
+        usersOverTime,
       },
       insights: {
         revenueByCategory,
         topProducts,
         productsByCategory,
+      },
+      vouchers: {
+        active: vouchersActive,
       },
       activities: {
         recentActivity,
@@ -1987,6 +2008,96 @@ exports.getAuditLogs = async (req, res) => {
       success: false,
       message: err.message,
     });
-
   }
-};
+}
+
+/**
+ * @desc Send email to users (all, all admins, or specific users). Supports scheduled send.
+ * @route POST /api/admin/send-email
+ * @access Private (Admin)
+ */
+const cron = require('node-cron');
+const scheduledEmailJobs = {}; // In-memory store for scheduled jobs
+
+exports.sendAdminEmail = async (req, res) => {
+  try {
+    const { recipients, subject, body, sendMode, scheduledAt } = req.body;
+
+    if (!subject || !body) {
+      return res.status(400).json({ success: false, message: 'Subject and body are required.' });
+    }
+    if (!recipients || !['all', 'admins', 'specific'].includes(recipients.type)) {
+      return res.status(400).json({ success: false, message: 'Invalid recipients type.' });
+    }
+
+    // Resolve recipient emails
+    let emails = [];
+    if (recipients.type === 'all') {
+      const users = await User.find({}, 'email').lean();
+      emails = users.map(u => u.email).filter(Boolean);
+    } else if (recipients.type === 'admins') {
+      const admins = await User.find({ role: { $in: ['admin', 'monitor', 'support', 'finance'] } }, 'email').lean();
+      emails = admins.map(u => u.email).filter(Boolean);
+    } else if (recipients.type === 'specific') {
+      emails = (recipients.emails || []).filter(Boolean);
+    }
+
+    if (emails.length === 0) {
+      return res.status(400).json({ success: false, message: 'No recipients found.' });
+    }
+
+    const doSend = async () => {
+      const errors = [];
+      for (const email of emails) {
+        try {
+          await sendEmail(email, subject, body);
+        } catch (err) {
+          errors.push({ email, error: err.message });
+        }
+      }
+      return errors;
+    };
+
+    if (sendMode === 'immediate' || !sendMode) {
+      const errors = await doSend();
+      return res.status(200).json({
+        success: true,
+        message: `Email sent to ${emails.length - errors.length}/${emails.length} recipients.`,
+        errors: errors.length > 0 ? errors : undefined,
+      });
+    }
+
+    // Scheduled send
+    if (!scheduledAt) {
+      return res.status(400).json({ success: false, message: 'scheduledAt is required for scheduled sends.' });
+    }
+    const sendTime = new Date(scheduledAt);
+    if (isNaN(sendTime.getTime()) || sendTime <= new Date()) {
+      return res.status(400).json({ success: false, message: 'scheduledAt must be a future date.' });
+    }
+
+    // Build cron expression from sendTime
+    const minute = sendTime.getMinutes();
+    const hour = sendTime.getHours();
+    const day = sendTime.getDate();
+    const month = sendTime.getMonth() + 1;
+    const cronExpr = `${minute} ${hour} ${day} ${month} *`;
+
+    const jobId = `email_job_${Date.now()}`;
+    const task = cron.schedule(cronExpr, async () => {
+      await doSend();
+      task.stop();
+      delete scheduledEmailJobs[jobId];
+    }, { scheduled: true, timezone: 'Asia/Ho_Chi_Minh' });
+
+    scheduledEmailJobs[jobId] = { task, scheduledAt: sendTime, subject, emails };
+
+    return res.status(200).json({
+      success: true,
+      message: `Email scheduled for ${sendTime.toISOString()} to ${emails.length} recipient(s).`,
+      jobId,
+    });
+  } catch (error) {
+    handleError(res, error, 'Lỗi gửi email', 500);
+  }
+}

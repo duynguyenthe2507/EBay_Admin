@@ -68,6 +68,7 @@ import PendingAccount from "./pages/PendingAccount";
 import ManageReviews from "./pages/DashboardAdmin/ManageReview/ManageReviews";
 import ManageDisputes from "./pages/DashboardAdmin/ManageDispute/ManageDisputes";
 import ManageAuditLogs from "./pages/DashboardAdmin/ManageAuditLog/ManageAuditLogs.js";
+import SendEmail from "./pages/DashboardAdmin/ManageUser/SendEmail";
 
 
 const Layout = () => {
@@ -144,23 +145,23 @@ const router = createBrowserRouter(
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Stores - Admin, Finance & Monitor */}
+        {/* Manage Stores - Admin, Support & Monitor */}
         <Route path="/admin/manage-stores" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.FINANCE, ROLES.MONITOR]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT, ROLES.MONITOR]}>
             <ManageStore />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Vouchers - Admin, Support, Finance & Monitor */}
+        {/* Manage Vouchers - Admin, Finance & Monitor */}
         <Route path="/admin/manage-vouchers" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT, ROLES.FINANCE, ROLES.MONITOR]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.FINANCE, ROLES.MONITOR]}>
             <ManageVoucher />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Orders - Admin & Monitor */}
+        {/* Manage Orders - Admin, Finance & Monitor */}
         <Route path="/admin/manage-orders" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MONITOR]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.FINANCE, ROLES.MONITOR]}>
             <ManageOrderAdmin />
           </ProtectedRoute>
         }></Route>
@@ -188,6 +189,12 @@ const router = createBrowserRouter(
             </ProtectedRoute>
           }
         />
+        {/* Send Email - Admin & Support */}
+        <Route path="/admin/send-email" element={
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT]}>
+            <SendEmail />
+          </ProtectedRoute>
+        }></Route>
       </Route>
 
       {/* Seller/Dashboard routes - protected to prevent buyer access */}

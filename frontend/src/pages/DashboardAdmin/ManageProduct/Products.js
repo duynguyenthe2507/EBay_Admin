@@ -30,7 +30,6 @@ import {
   TextField,
   Typography,
   Grid,
-  MenuItem,
   List,
   ListItem,
   ListItemText,
@@ -70,7 +69,7 @@ export default function Products({
   const [productRatings, setProductRatings] = React.useState({});
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
-  
+
   // Active/Inactive statuses for filter
   const activeStatuses = ["active", "inactive"];
   const handleDeleteProduct = async () => {
@@ -81,9 +80,8 @@ export default function Products({
         `http://localhost:9999/api/admin/products/${deletingProduct._id}`,
         {
           headers: {
-            Authorization: `Bearer ${
-              localStorage.getItem("accessToken") || ""
-            }`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken") || ""
+              }`,
           },
         }
       );
@@ -103,9 +101,8 @@ export default function Products({
       console.error("Delete error:", error.response || error);
       setSnackbar({
         open: true,
-        msg: `Error deleting product! ${
-          error.response?.data?.message || error.message
-        }`,
+        msg: `Error deleting product! ${error.response?.data?.message || error.message
+          }`,
         severity: "error",
       });
       setDeletingProduct(null);
@@ -167,7 +164,7 @@ export default function Products({
   }, [stores, storeSearch]);
 
   // Define rating ranges
-  
+
   const ratingRanges = [
     { label: ">4", min: 4, max: 5.1 },
     { label: "3 < =<4", min: 3, max: 4 },
@@ -372,9 +369,8 @@ export default function Products({
             {reviews.map((review) => (
               <ListItem key={review._id} divider>
                 <ListItemText
-                  primary={`${review.rating} stars - ${
-                    review.reviewerId?.username || "Anonymous"
-                  }`}
+                  primary={`${review.rating} stars - ${review.reviewerId?.username || "Anonymous"
+                    }`}
                   secondary={review.comment}
                 />
               </ListItem>
@@ -421,21 +417,21 @@ export default function Products({
               {(selectedActiveStatuses.length > 0 ||
                 selectedStores.length > 0 ||
                 selectedRatingRanges.length > 0) && (
-                <Tooltip title="Clear all">
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      setSelectedActiveStatuses([]);
-                      setSelectedStores([]);
-                      setSelectedRatingRanges([]);
-                      setKeywords("");
-                      setStoreSearch("");
-                    }}
-                  >
-                    <ClearAllIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              )}
+                  <Tooltip title="Clear all">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        setSelectedActiveStatuses([]);
+                        setSelectedStores([]);
+                        setSelectedRatingRanges([]);
+                        setKeywords("");
+                        setStoreSearch("");
+                      }}
+                    >
+                      <ClearAllIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                )}
             </Box>
 
             {/* Search */}

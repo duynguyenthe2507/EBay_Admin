@@ -21,7 +21,6 @@ import {
   DialogContentText,
   DialogTitle,
   FormControlLabel,
-  FormGroup,
   IconButton,
   Paper,
   Radio,
@@ -58,7 +57,7 @@ import LockOpenIcon from "@mui/icons-material/LockOpen";
 import BlockIcon from "@mui/icons-material/Block";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import PendingIcon from "@mui/icons-material/Pending";
+import EmailIcon from "@mui/icons-material/Email";
 import Title from "../Title";
 
 // Component to display user status
@@ -712,6 +711,28 @@ export default function Users({
                     </Typography>
                   </Badge>
                 </Typography>
+                {!isMonitor && (
+                  <Button
+                    id="send-email-btn"
+                    variant="contained"
+                    color="primary"
+                    startIcon={<EmailIcon />}
+                    onClick={() => navigate('/admin/send-email')}
+                    sx={{
+                      borderRadius: 2,
+                      fontWeight: 'bold',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      boxShadow: '0 4px 15px rgba(102,126,234,0.4)',
+                      '&:hover': {
+                        boxShadow: '0 6px 20px rgba(102,126,234,0.6)',
+                        transform: 'translateY(-1px)',
+                      },
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    Send Email
+                  </Button>
+                )}
               </Box>
 
               <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2, mb: 2 }}>
