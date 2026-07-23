@@ -536,84 +536,84 @@ exports.updateStoreStatusByAdmin = async (req, res) => {
           await seller.save();
         }
       }
-      if (status === "approved") {
-        auditAction = AUDIT.STORE_APPROVE;
-        auditDescription = `Approved shop ${store.storeName}`;
-      } else if (status === "rejected") {
-        auditAction = AUDIT.STORE_REJECT;
-        auditDescription = `Rejected shop ${store.storeName}`;
-      } else if (status === "locked") {
-        auditAction = "STORE_LOCK";
-        auditDescription = `Locked shop ${store.storeName}`;
-      } else if (status === "active") {
-        auditAction = "STORE_UNLOCK";
-        auditDescription = `Unlocked shop ${store.storeName}`;
-      } else {
-        auditDescription = `Updated shop ${store.storeName} status to ${status}`;
-      }
+    if (status === "approved") {
+      auditAction = AUDIT.STORE_APPROVE;
+      auditDescription = `Approved shop ${store.storeName}`;
+    } else if (status === "rejected") {
+      auditAction = AUDIT.STORE_REJECT;
+      auditDescription = `Rejected shop ${store.storeName}`;
+    } else if (status === "locked") {
+      auditAction = "STORE_LOCK";
+      auditDescription = `Locked shop ${store.storeName}`;
+    } else if (status === "active") {
+      auditAction = "STORE_UNLOCK";
+      auditDescription = `Unlocked shop ${store.storeName}`;
+    } else {
+      auditDescription = `Updated shop ${store.storeName} status to ${status}`;
+    }
 
-      store.status = status;
-      await store.save();
+    store.status = status;
+    await store.save();
 
-      await createAuditLog({
-        admin: req.user.id,
-        action: auditAction,
-        targetType: "Shop",
-        targetId: store._id,
-        description: auditDescription,
-        oldValue: { status: previousStatus },
-        newValue: { status: status },
-      }, req);
+    await createAuditLog({
+      admin: req.user.id,
+      action: auditAction,
+      targetType: "Shop",
+      targetId: store._id,
+      description: auditDescription,
+      oldValue: { status: previousStatus },
+      newValue: { status: status },
+    }, req);
 
-      if (status !== previousStatus) {
-        const seller = await User.findById(store.sellerId);
+    if (status !== previousStatus) {
+      const seller = await User.findById(store.sellerId);
 
-        if (seller) {
-          let emailSubject;
-          let emailText;
+      if (seller) {
+        let emailSubject;
+        let emailText;
 
-          switch (status) {
-            case "approved":
-              emailSubject = "Cửa hàng của bạn đã được duyệt";
-              emailText = `Kính gửi ${seller.username},
+        switch (status) {
+          case "approved":
+            emailSubject = "Cửa hàng của bạn đã được duyệt";
+            emailText = `Kính gửi ${seller.username},
 
 Cửa hàng "${store.storeName}" đã được duyệt.
 
 Trân trọng,
 Shopii Team`;
-              break;
+            break;
 
-            case "rejected":
-              emailSubject = "Cửa hàng của bạn đã bị từ chối";
-              emailText = `Kính gửi ${seller.username},
+          case "rejected":
+            emailSubject = "Cửa hàng của bạn đã bị từ chối";
+            emailText = `Kính gửi ${seller.username},
 
 Cửa hàng "${store.storeName}" đã bị từ chối.
 
 Trân trọng,
 Shopii Team`;
-              break;
+            break;
 
-            case "pending":
-              emailSubject = "Cửa hàng đang chờ duyệt";
-              emailText = `Kính gửi ${seller.username},
+          case "pending":
+            emailSubject = "Cửa hàng đang chờ duyệt";
+            emailText = `Kính gửi ${seller.username},
 
 Cửa hàng "${store.storeName}" đang ở trạng thái chờ duyệt.
 
 Trân trọng,
 Shopii Team`;
-              break;
-          }
-
-          await sendEmail(seller.email, emailSubject, emailText);
+            break;
         }
-      }
 
-      res.status(200).json({
-        success: true,
-        message: `Cập nhật trạng thái cửa hàng thành công`,
-        data: store,
-      });
+        await sendEmail(seller.email, emailSubject, emailText);
+      }
     }
+
+    res.status(200).json({
+      success: true,
+      message: `Cập nhật trạng thái cửa hàng thành công`,
+      data: store,
+    });
+  }
   } catch (error) {
     handleError(res, error, "Lỗi khi cập nhật trạng thái cửa hàng");
   }
@@ -1763,8 +1763,26 @@ exports.getAdminReport = async (req, res) => {
       Order.aggregate([
         { $match: { ...dateFilter, status: "shipped" } },
         {
+          $addFields: {
+            normalizedOrderDate: {
+              $convert: {
+                input: "$orderDate",
+                to: "date",
+                onError: null,
+                onNull: null,
+              },
+            },
+          },
+        },
+        { $match: { normalizedOrderDate: { $ne: null } } },
+        {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$normalizedOrderDate",
+              },
+            },
             revenue: { $sum: "$totalPrice" },
           },
         },
@@ -1774,8 +1792,26 @@ exports.getAdminReport = async (req, res) => {
       Order.aggregate([
         { $match: dateFilter },
         {
+          $addFields: {
+            normalizedOrderDate: {
+              $convert: {
+                input: "$orderDate",
+                to: "date",
+                onError: null,
+                onNull: null,
+              },
+            },
+          },
+        },
+        { $match: { normalizedOrderDate: { $ne: null } } },
+        {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$normalizedOrderDate",
+              },
+            },
             orders: { $sum: 1 },
           },
         },
@@ -1911,8 +1947,26 @@ exports.getAdminReport = async (req, res) => {
       User.aggregate([
         { $match: dateFilter },
         {
+          $addFields: {
+            normalizedCreatedAt: {
+              $convert: {
+                input: "$createdAt",
+                to: "date",
+                onError: null,
+                onNull: null,
+              },
+            },
+          },
+        },
+        { $match: { normalizedCreatedAt: { $ne: null } } },
+        {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$normalizedCreatedAt",
+              },
+            },
             count: { $sum: 1 },
           },
         },

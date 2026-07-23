@@ -99,8 +99,12 @@
     "accountStatus": "approved",
     "twoFAEnabled": false,
     "trustedDevices": [],
-    "createdAt": "2026-07-21T11:38:58.002+00:00",
-    "updatedAt": "2026-07-21T11:38:58.002+00:00",
+    "createdAt": {
+      "$date": "2026-07-21T11:38:58.002Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-21T11:38:58.002Z"
+    },
     "__v": 0
   }
 ]
