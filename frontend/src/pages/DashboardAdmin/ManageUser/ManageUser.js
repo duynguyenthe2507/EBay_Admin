@@ -6,16 +6,33 @@ import { useOutletContext } from "react-router-dom";
 import axios from "axios";
 
 export default function ManageUser() {
-  const { handleSetDashboardTitle, isMonitor } = useOutletContext();
+  const { handleSetDashboardTitle } = useOutletContext();
+
+  const getCurrentRole = () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      if (!token) return "";
+
+      const payload = JSON.parse(atob(token.split(".")[1]));
+
+      return payload.role || "";
+    } catch (error) {
+      console.error("Cannot decode token:", error);
+      return "";
+    }
+  };
+
+  const currentRole = getCurrentRole();
   const [users, setUsers] = React.useState([]);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [totalPages, setTotalPages] = React.useState(1);
   const [totalUsers, setTotalUsers] = React.useState(0);
   const [filters, setFilters] = React.useState({
-    search: '',
-    role: '',
-    action: 'all',
-    newUsers: false
+    search: "",
+    role: "",
+    action: "all",
+    newUsers: false,
   });
 
   // Set the dashboard title
@@ -24,42 +41,45 @@ export default function ManageUser() {
   }, [handleSetDashboardTitle]);
 
   // Fetch users with pagination and filters
-  const updateUserList = React.useCallback(async (page = 1, currentFilters = filters) => {
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: '10'
-      });
+  const updateUserList = React.useCallback(
+    async (page = 1, currentFilters = filters) => {
+      try {
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: "10",
+        });
 
-      if (currentFilters.search) {
-        params.append('search', currentFilters.search);
-      }
-      if (currentFilters.role && currentFilters.role !== 'all') {
-        params.append('role', currentFilters.role);
-      }
-      if (currentFilters.action && currentFilters.action !== 'all') {
-        params.append('action', currentFilters.action);
-      }
-      if (currentFilters.newUsers) {
-        params.append('newUsers', 'true');
-      }
-
-      const res = await axios.get(
-        `http://localhost:9999/api/admin/users?${params.toString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
+        if (currentFilters.search) {
+          params.append("search", currentFilters.search);
         }
-      );
-      setUsers(res.data.data || []);
-      setTotalPages(res.data.totalPages || 1);
-      setCurrentPage(res.data.currentPage || 1);
-      setTotalUsers(res.data.total || 0);
-    } catch (error) {
-      console.error("Error fetching user list:", error);
-    }
-  }, [filters]);
+        if (currentFilters.role && currentFilters.role !== "all") {
+          params.append("role", currentFilters.role);
+        }
+        if (currentFilters.action && currentFilters.action !== "all") {
+          params.append("action", currentFilters.action);
+        }
+        if (currentFilters.newUsers) {
+          params.append("newUsers", "true");
+        }
+
+        const res = await axios.get(
+          `http://localhost:9999/api/admin/users?${params.toString()}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          },
+        );
+        setUsers(res.data.data || []);
+        setTotalPages(res.data.totalPages || 1);
+        setCurrentPage(res.data.currentPage || 1);
+        setTotalUsers(res.data.total || 0);
+      } catch (error) {
+        console.error("Error fetching user list:", error);
+      }
+    },
+    [filters],
+  );
 
   React.useEffect(() => {
     updateUserList(1, filters);
@@ -81,13 +101,15 @@ export default function ManageUser() {
         <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
           <Users
             users={users}
-            onUserUpdated={(page) => updateUserList(page || currentPage, filters)}
+            onUserUpdated={(page) =>
+              updateUserList(page || currentPage, filters)
+            }
             currentPage={currentPage}
             totalPages={totalPages}
             totalUsers={totalUsers}
             onPageChange={handlePageChange}
             filters={filters}
-            isMonitor={isMonitor}
+            currentRole={currentRole}
             onFiltersChange={handleFiltersChange}
           />
         </Paper>

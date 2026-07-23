@@ -7,140 +7,162 @@ import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
-import axios from "axios";
-import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import axios from "axios";
+
+const ALL_ROLES = [
+  { value: "buyer", label: "Buyer" },
+  { value: "seller", label: "Seller" },
+  { value: "admin", label: "Admin" },
+  { value: "monitor", label: "Monitor" },
+  { value: "support", label: "Support" },
+  { value: "finance", label: "Finance" },
+];
 
 export default function UpdateUser({
   targetUser,
   onUpdated,
   open,
   handleClose,
+  currentRole,
 }) {
-  const [username, setUsername] = React.useState(targetUser?.username || "");
-  const [email, setEmail] = React.useState(targetUser?.email || "");
-  const [role, setRole] = React.useState(targetUser?.role || "");
-  const [action, setAction] = React.useState(targetUser?.action || "");
-  const [snackbar, setSnackbar] = React.useState({
-    open: false,
-    msg: "",
-    severity: "success",
-  });
+  const [username, setUsername] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [role, setRole] = React.useState("");
+  const [saving, setSaving] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState("");
+
+  const canChangeRole = ["admin", "support"].includes(currentRole);
 
   React.useEffect(() => {
     setUsername(targetUser?.username || "");
     setEmail(targetUser?.email || "");
     setRole(targetUser?.role || "");
-    setAction(targetUser?.action || "");
+    setErrorMessage("");
   }, [targetUser, open]);
 
-  const handleUpdateUser = async (e) => {
-    e.preventDefault();
+  const handleUpdateUser = async (event) => {
+    event.preventDefault();
+
+    if (!canChangeRole) {
+      setErrorMessage("You only have permission to view user information.");
+      return;
+    }
+
     try {
-      const reqBody = { username, email, role, action };
+      setSaving(true);
+      setErrorMessage("");
+
       const response = await axios.put(
         `http://localhost:9999/api/admin/users/${targetUser._id}`,
-        reqBody,
+        {
+          username,
+          email,
+          role,
+        },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
-        }
+        },
       );
+
       if (response.status === 200) {
-        setSnackbar({
-          open: true,
-          msg: "Update successful!",
-          severity: "success",
-        });
         onUpdated(true);
+        handleClose();
       }
-      handleClose();
     } catch (error) {
       console.error("Update error:", error);
-      setSnackbar({
-        open: true,
-        msg: error?.response?.data?.message || "An error occurred!",
-        severity: "error",
-      });
+
+      setErrorMessage(
+        error.response?.data?.message ||
+          "An error occurred while updating user.",
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
-    <>
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 700, fontSize: 22, color: "#1976d2" }}>
-          Update User
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText sx={{ mb: 2 }}>
-            To update user details, please fill out the information below and
-            submit a request:
-          </DialogContentText>
-          <form onSubmit={handleUpdateUser} sx={{ mt: 0 }}>
-            <TextField
-              label="User Name"
-              variant="outlined"
-              fullWidth
-              required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              label="Email"
-              variant="outlined"
-              fullWidth
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              select
-              label="Role"
-              variant="outlined"
-              fullWidth
-              required
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              sx={{ mb: 2 }}
-            >
-              <MenuItem value="buyer">Buyer</MenuItem>
-              <MenuItem value="seller">Seller</MenuItem>
-              <MenuItem value="admin">Admin</MenuItem>
-            </TextField>
-            <TextField
-              select
-              label="Action"
-              variant="outlined"
-              fullWidth
-              value={action}
-              onChange={(e) => setAction(e.target.value)}
-              sx={{ mb: 2 }}
-            >
-              <MenuItem value="lock">Lock</MenuItem>
-              <MenuItem value="unlock">Unlock</MenuItem>
-            </TextField>
-            <DialogActions sx={{ mt: 2, px: 0 }}>
-              <Button onClick={handleClose} variant="text" color="secondary">
-                Cancel
-              </Button>
-              <Button type="submit" variant="contained" color="primary">
-                Save
-              </Button>
-            </DialogActions>
-          </form>
-        </DialogContent>
-      </Dialog>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={2500}
-        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle
+        sx={{
+          fontWeight: 700,
+          fontSize: 22,
+          color: "#1976d2",
+        }}
       >
-        <Alert severity={snackbar.severity}>{snackbar.msg}</Alert>
-      </Snackbar>
-    </>
+        {canChangeRole ? "Update User" : "User Details"}
+      </DialogTitle>
+
+      <DialogContent>
+        <DialogContentText sx={{ mb: 2 }}>
+          {canChangeRole
+            ? "Update the user's information and system role."
+            : "You only have permission to view this user's information."}
+        </DialogContentText>
+
+        {errorMessage && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {errorMessage}
+          </Alert>
+        )}
+
+        <Box component="form" onSubmit={handleUpdateUser}>
+          <TextField
+            label="User Name"
+            variant="outlined"
+            fullWidth
+            required
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+            disabled={!canChangeRole}
+            sx={{ mb: 2 }}
+          />
+
+          <TextField
+            label="Email"
+            variant="outlined"
+            fullWidth
+            required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            disabled={!canChangeRole}
+            sx={{ mb: 2 }}
+          />
+
+          <TextField
+            select
+            label="Role"
+            variant="outlined"
+            fullWidth
+            required
+            value={role}
+            onChange={(event) => setRole(event.target.value)}
+            disabled={!canChangeRole}
+            sx={{ mb: 2 }}
+          >
+            {ALL_ROLES.map((roleOption) => (
+              <MenuItem key={roleOption.value} value={roleOption.value}>
+                {roleOption.label}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <DialogActions sx={{ mt: 2, px: 0 }}>
+            <Button onClick={handleClose} color="inherit">
+              {canChangeRole ? "Cancel" : "Close"}
+            </Button>
+
+            {canChangeRole && (
+              <Button type="submit" variant="contained" disabled={saving}>
+                {saving ? "Saving..." : "Save"}
+              </Button>
+            )}
+          </DialogActions>
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 }

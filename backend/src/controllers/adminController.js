@@ -45,102 +45,81 @@ const handleError = (res, error, message = "Lỗi Máy Chủ", statusCode = 500)
  */
 exports.getAllUsers = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const limit = Math.max(parseInt(req.query.limit, 10) || 10, 1);
     const skip = (page - 1) * limit;
-    let query = {};
 
-    // Exclude admin users from the list
-    query.role = { $ne: 'admin' };
+    const query = {};
 
-    // Filter by search
-    if (req.query.search) {
-      const searchRegex = { $regex: req.query.search, $options: "i" };
+    if (req.query.search?.trim()) {
+      const searchRegex = {
+        $regex: req.query.search.trim(),
+        $options: "i",
+      };
 
-      // Try to find users by username/email (excluding admin)
-      const foundUsers = await User.find({
-        $or: [
-          { username: searchRegex },
-          { email: searchRegex }
-        ],
-        role: { $ne: 'admin' } // Exclude admin in search
-      }).select('_id');
+      query.$or = [
+        { username: searchRegex },
+        { email: searchRegex },
+        { fullname: searchRegex },
+      ];
 
-      // Build search query
-      const searchConditions = [];
-
-      // Search by user ID (if it's a valid ObjectId)
-      if (mongoose.Types.ObjectId.isValid(req.query.search)) {
-        const searchId = new mongoose.Types.ObjectId(req.query.search);
-        // Verify it's not an admin
-        const userCheck = await User.findById(searchId).select('role');
-        if (userCheck && userCheck.role !== 'admin') {
-          searchConditions.push({ _id: searchId });
-        }
-      }
-
-      // Search by found user IDs
-      if (foundUsers.length > 0) {
-        const userIds = foundUsers.map(u => u._id);
-        searchConditions.push({ _id: { $in: userIds } });
-      }
-
-      if (searchConditions.length > 0) {
-        // Use $and to combine role exclusion with search
-        query.$and = [
-          { role: { $ne: 'admin' } },
-          { $or: searchConditions }
-        ];
-        delete query.role; // Remove direct role assignment since we use $and
-      } else {
-        // No search results found, but still exclude admin
-        query.role = { $ne: 'admin' };
+      if (mongoose.Types.ObjectId.isValid(req.query.search.trim())) {
+        query.$or.push({
+          _id: new mongoose.Types.ObjectId(req.query.search.trim()),
+        });
       }
     }
 
-    // Filter by role (but exclude admin)
-    if (req.query.role && req.query.role !== 'admin') {
-      if (query.$and) {
-        // If $and exists, update the role condition in $and
-        const roleCondition = query.$and.find(c => c.role);
-        if (roleCondition) {
-          roleCondition.role = req.query.role;
-        } else {
-          query.$and.push({ role: req.query.role });
-        }
-      } else {
-        query.role = req.query.role;
-      }
+    const validRoles = [
+      "buyer",
+      "seller",
+      "admin",
+      "monitor",
+      "support",
+      "finance",
+    ];
+
+    if (
+      req.query.role &&
+      req.query.role !== "all" &&
+      validRoles.includes(req.query.role)
+    ) {
+      query.role = req.query.role;
     }
 
-    // Filter by action (lock/unlock)
-    if (req.query.action && req.query.action !== 'all') {
+    if (
+      req.query.action &&
+      req.query.action !== "all" &&
+      ["lock", "unlock"].includes(req.query.action)
+    ) {
       query.action = req.query.action;
     }
 
-    // Filter by new users (tài khoản mới trong 2 tuần / 14 ngày)
-    if (req.query.newUsers === 'true') {
+    if (req.query.newUsers === "true") {
       const twoWeeksAgo = new Date();
       twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
       query.createdAt = { $gte: twoWeeksAgo };
     }
 
-    const users = await User.find(query)
-      .select("-password")
-      .sort({ createdAt: -1 }) // Mới nhất trước
-      .skip(skip)
-      .limit(limit);
-    const totalUsers = await User.countDocuments(query);
+    const [users, totalUsers] = await Promise.all([
+      User.find(query)
+        .select("-password")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
 
-    res.status(200).json({
+      User.countDocuments(query),
+    ]);
+
+    return res.status(200).json({
       success: true,
       data: users,
-      totalPages: Math.ceil(totalUsers / limit),
+      totalPages: Math.max(Math.ceil(totalUsers / limit), 1),
       currentPage: page,
       total: totalUsers,
     });
   } catch (error) {
-    handleError(res, error, "Lỗi khi lấy danh sách người dùng");
+    return handleError(res, error, "Lỗi khi lấy danh sách người dùng");
   }
 };
 
@@ -216,13 +195,13 @@ exports.approveUser = async (req, res) => {
 
     // Set account status
     if (approved) {
-      user.accountStatus = 'approved';
+      user.accountStatus = "approved";
       user.approvedAt = new Date();
       user.approvedBy = req.user.id;
       user.rejectionReason = null; // Clear rejection reason when approved
     } else {
       // Nếu từ chối, set status = 'rejected'
-      user.accountStatus = 'rejected';
+      user.accountStatus = "rejected";
       user.approvedAt = null;
       user.approvedBy = null;
       user.rejectionReason = rejectionReason || null; // Save rejection reason if provided
@@ -253,7 +232,7 @@ exports.approveUser = async (req, res) => {
       try {
         await sendEmail(user.email, emailSubject, emailText);
       } catch (emailError) {
-        console.error('Error sending approval/rejection email:', emailError);
+        console.error("Error sending approval/rejection email:", emailError);
         // Don't fail the request if email fails
       }
     }
@@ -279,12 +258,12 @@ exports.approveUser = async (req, res) => {
  * @access Riêng tư (Admin)
  */
 exports.updateUserByAdmin = async (req, res) => {
-  const { createAuditLog } = require("../services/auditLogService");
   const { userId } = req.params;
   const { role, action, username, email } = req.body;
 
   try {
     const user = await User.findById(userId);
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -292,19 +271,62 @@ exports.updateUserByAdmin = async (req, res) => {
       });
     }
 
-    const previousAction = user.action;
+    const requesterRole = req.user.role;
+    const canChangeRole = ["admin", "support"].includes(requesterRole);
 
-    // Mặc định nếu chỉ sửa username, email, role... thì log là USER_UPDATE
+    const validRoles = [
+      "buyer",
+      "seller",
+      "admin",
+      "monitor",
+      "support",
+      "finance",
+    ];
+
+    /*
+     * Chỉ admin và support được thay đổi role.
+     * Các role khác gọi API có field role sẽ bị từ chối.
+     */
+    if (role !== undefined) {
+      if (!canChangeRole) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "Chỉ tài khoản Admin hoặc Support mới được phép thay đổi vai trò.",
+        });
+      }
+
+      if (!validRoles.includes(role)) {
+        return res.status(400).json({
+          success: false,
+          message: `Vai trò không hợp lệ. Các vai trò hợp lệ: ${validRoles.join(
+            ", ",
+          )}`,
+        });
+      }
+    }
+
+    const previousAction = user.action;
+    const previousRole = user.role;
+
     let auditAction = AUDIT.USER_UPDATE;
     let auditDescription = `Cập nhật thông tin người dùng ${user.username}`;
 
-    if (username) user.username = username;
-    if (email) user.email = email;
-    if (role && ["buyer", "seller", "admin"].includes(role)) {
-      user.role = role;
+    if (username !== undefined && username.trim()) {
+      user.username = username.trim();
     }
 
-    // Xử lý khi có gửi field `action`
+    if (email !== undefined && email.trim()) {
+      user.email = email.trim().toLowerCase();
+    }
+
+    if (role !== undefined && role !== previousRole) {
+      user.role = role;
+      auditDescription =
+        `Đổi vai trò người dùng ${user.username}: ` +
+        `${previousRole} → ${role}`;
+    }
+
     if (action && ["lock", "unlock"].includes(action)) {
       user.action = action;
 
@@ -314,39 +336,56 @@ exports.updateUserByAdmin = async (req, res) => {
 
         if (user.role === "seller") {
           const store = await Store.findOne({ sellerId: user._id });
+
           if (store) {
             store.status = "rejected";
             await store.save();
 
-            await sendEmail(
-              user.email,
-              "Cửa hàng của bạn đã bị từ chối",
-              `Kính gửi ${user.username}, ...`
-            );
+            try {
+              await sendEmail(
+                user.email,
+                "Cửa hàng của bạn đã bị từ chối",
+                `Kính gửi ${user.username}, cửa hàng của bạn đã bị từ chối do tài khoản bị khóa.`,
+              );
+            } catch (emailError) {
+              console.error(
+                "Không thể gửi email từ chối cửa hàng:",
+                emailError.message,
+              );
+            }
           }
         }
-      } else if (action === "unlock") {
+      } else {
         auditAction = AUDIT.USER_UNLOCK;
         auditDescription = `Mở khóa người dùng ${user.username}`;
       }
 
-      // Chỉ gửi Email khi thực sự có sự thay đổi trạng thái Lock <-> Unlock
-      if (action !== previousAction) {
+      if (action !== previousAction && user.email) {
         const emailSubject =
           action === "lock"
             ? "Tài khoản của bạn đã bị khóa"
             : "Tài khoản của bạn đã được mở khóa";
 
-        await sendEmail(user.email, emailSubject, `Kính gửi ${user.username}, ...`);
+        try {
+          await sendEmail(
+            user.email,
+            emailSubject,
+            `Kính gửi ${user.username}, trạng thái tài khoản của bạn đã được cập nhật.`,
+          );
+        } catch (emailError) {
+          console.error(
+            "Không thể gửi email trạng thái tài khoản:",
+            emailError.message,
+          );
+        }
       }
     }
 
     await user.save();
 
-    // ===== Ghi Audit Log với đúng hành động =====
     await createAuditLog({
       admin: req.user.id,
-      action: auditAction, // Sẽ ra "USER_LOCK", "USER_UNLOCK" hoặc "USER_UPDATE"
+      action: auditAction,
       targetType: "User",
       targetId: user._id,
       description: auditDescription,
@@ -357,7 +396,7 @@ exports.updateUserByAdmin = async (req, res) => {
     const userToReturn = user.toObject();
     delete userToReturn.password;
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Cập nhật người dùng thành công",
       data: userToReturn,
@@ -366,7 +405,8 @@ exports.updateUserByAdmin = async (req, res) => {
     if (error.code === 11000 && error.keyPattern?.email) {
       return handleError(res, error, "Email đã được sử dụng.", 400);
     }
-    handleError(res, error, "Lỗi khi cập nhật người dùng");
+
+    return handleError(res, error, "Lỗi khi cập nhật người dùng");
   }
 };
 // --- Quản Lý Cửa Hàng (Store Management) ---
@@ -403,7 +443,7 @@ exports.getAllStoresAdmin = async (req, res) => {
           storeObj.totalReviews = feedback ? feedback.totalReviews : 0;
 
           return storeObj;
-        })
+        }),
       );
     }
 
@@ -428,7 +468,7 @@ exports.getStoreDetails = async (req, res) => {
   try {
     const store = await Store.findById(req.params.storeId).populate(
       "sellerId",
-      "username email"
+      "username email",
     );
     if (!store) {
       return res
@@ -745,18 +785,12 @@ exports.updateProductStatusAdmin = async (req, res) => {
       product.title = title;
     }
 
-    if (
-      description !== undefined &&
-      description !== product.description
-    ) {
+    if (description !== undefined && description !== product.description) {
       changes.push("description updated");
       product.description = description;
     }
 
-    if (
-      price !== undefined &&
-      Number(price) !== Number(product.price)
-    ) {
+    if (price !== undefined && Number(price) !== Number(product.price)) {
       changes.push(`price: ${product.price} → ${price}`);
       product.price = price;
     }
@@ -874,7 +908,17 @@ exports.getAllOrdersAdmin = async (req, res) => {
     let query = {};
 
     // Filter by status
-    if (req.query.status && ['pending', 'processing', 'shipping', 'shipped', 'failed to ship', 'rejected'].includes(req.query.status)) {
+    if (
+      req.query.status &&
+      [
+        "pending",
+        "processing",
+        "shipping",
+        "shipped",
+        "failed to ship",
+        "rejected",
+      ].includes(req.query.status)
+    ) {
       query.status = req.query.status;
     }
 
@@ -884,23 +928,22 @@ exports.getAllOrdersAdmin = async (req, res) => {
 
       // Try to find buyers by username/email
       const buyers = await User.find({
-        $or: [
-          { username: searchRegex },
-          { email: searchRegex }
-        ]
-      }).select('_id');
+        $or: [{ username: searchRegex }, { email: searchRegex }],
+      }).select("_id");
 
       // Build search query
       const searchConditions = [];
 
       // Search by order ID (if it's a valid ObjectId)
       if (mongoose.Types.ObjectId.isValid(req.query.search)) {
-        searchConditions.push({ _id: new mongoose.Types.ObjectId(req.query.search) });
+        searchConditions.push({
+          _id: new mongoose.Types.ObjectId(req.query.search),
+        });
       }
 
       // Search by buyer IDs
       if (buyers.length > 0) {
-        const buyerIds = buyers.map(b => b._id);
+        const buyerIds = buyers.map((b) => b._id);
         searchConditions.push({ buyerId: { $in: buyerIds } });
       }
 
@@ -922,8 +965,8 @@ exports.getAllOrdersAdmin = async (req, res) => {
 
     // Get orders with populated buyer and address
     const orders = await Order.find(query)
-      .populate('buyerId', 'username email fullname')
-      .populate('addressId')
+      .populate("buyerId", "username email fullname")
+      .populate("addressId")
       .sort({ orderDate: -1 }) // Mới nhất trước
       .skip(skip)
       .limit(limit)
@@ -938,40 +981,42 @@ exports.getAllOrdersAdmin = async (req, res) => {
         // Get order items with product details
         const items = await OrderItem.find({ orderId: order._id })
           .populate({
-            path: 'productId',
-            select: 'title image price sellerId',
+            path: "productId",
+            select: "title image price sellerId",
             populate: {
-              path: 'sellerId',
-              select: 'username email'
-            }
+              path: "sellerId",
+              select: "username email",
+            },
           })
           .lean();
 
         // Get payment info
         const payment = await Payment.findOne({ orderId: order._id })
-          .select('method status amount transactionId paidAt')
+          .select("method status amount transactionId paidAt")
           .lean();
 
         // Get shipping info for items
         const shippingInfos = await ShippingInfo.find({
-          orderItemId: { $in: items.map(item => item._id) }
+          orderItemId: { $in: items.map((item) => item._id) },
         }).lean();
 
         // Attach shipping info to items
-        const itemsWithShipping = items.map(item => {
-          const shipping = shippingInfos.find(s => s.orderItemId.toString() === item._id.toString());
+        const itemsWithShipping = items.map((item) => {
+          const shipping = shippingInfos.find(
+            (s) => s.orderItemId.toString() === item._id.toString(),
+          );
           return {
             ...item,
-            shippingInfo: shipping || null
+            shippingInfo: shipping || null,
           };
         });
 
         return {
           ...order,
           items: itemsWithShipping,
-          payment: payment || null
+          payment: payment || null,
         };
-      })
+      }),
     );
 
     res.status(200).json({
@@ -997,8 +1042,8 @@ exports.getOrderDetailsAdmin = async (req, res) => {
 
     // Find order with populated buyer and address
     const order = await Order.findById(orderId)
-      .populate('buyerId', 'username email fullname phone avatarURL')
-      .populate('addressId')
+      .populate("buyerId", "username email fullname phone avatarURL")
+      .populate("addressId")
       .lean();
 
     if (!order) {
@@ -1010,37 +1055,39 @@ exports.getOrderDetailsAdmin = async (req, res) => {
     // Get order items with product details
     const items = await OrderItem.find({ orderId })
       .populate({
-        path: 'productId',
-        select: 'title image price description sellerId categoryId',
+        path: "productId",
+        select: "title image price description sellerId categoryId",
         populate: [
           {
-            path: 'sellerId',
-            select: 'username email'
+            path: "sellerId",
+            select: "username email",
           },
           {
-            path: 'categoryId',
-            select: 'name'
-          }
-        ]
+            path: "categoryId",
+            select: "name",
+          },
+        ],
       })
       .lean();
 
     // Get payment info
     const payment = await Payment.findOne({ orderId })
-      .select('method status amount transactionId paidAt createdAt')
+      .select("method status amount transactionId paidAt createdAt")
       .lean();
 
     // Get shipping info for each item
     const shippingInfos = await ShippingInfo.find({
-      orderItemId: { $in: items.map(item => item._id) }
+      orderItemId: { $in: items.map((item) => item._id) },
     }).lean();
 
     // Attach shipping info to items
-    const itemsWithShipping = items.map(item => {
-      const shipping = shippingInfos.find(s => s.orderItemId.toString() === item._id.toString());
+    const itemsWithShipping = items.map((item) => {
+      const shipping = shippingInfos.find(
+        (s) => s.orderItemId.toString() === item._id.toString(),
+      );
       return {
         ...item,
-        shippingInfo: shipping || null
+        shippingInfo: shipping || null,
       };
     });
 
@@ -1049,7 +1096,7 @@ exports.getOrderDetailsAdmin = async (req, res) => {
       data: {
         ...order,
         items: itemsWithShipping,
-        payment: payment || null
+        payment: payment || null,
       },
     });
   } catch (error) {
@@ -1068,11 +1115,18 @@ exports.updateOrderStatusAdmin = async (req, res) => {
     const { status } = req.body;
 
     // Validate status
-    const validStatuses = ['pending', 'processing', 'shipping', 'shipped', 'failed to ship', 'rejected'];
+    const validStatuses = [
+      "pending",
+      "processing",
+      "shipping",
+      "shipped",
+      "failed to ship",
+      "rejected",
+    ];
     if (!status || !validStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
-        message: `Trạng thái không hợp lệ. Các trạng thái hợp lệ: ${validStatuses.join(', ')}`
+        message: `Trạng thái không hợp lệ. Các trạng thái hợp lệ: ${validStatuses.join(", ")}`,
       });
     }
 
@@ -1089,26 +1143,26 @@ exports.updateOrderStatusAdmin = async (req, res) => {
     await order.save();
 
     // Get buyer info for email notification
-    const buyer = await User.findById(order.buyerId).select('email username');
+    const buyer = await User.findById(order.buyerId).select("email username");
 
     // Send email notification if status changed
     if (buyer && buyer.email) {
       const statusMessages = {
-        'pending': 'đang chờ xử lý',
-        'processing': 'đang được xử lý',
-        'shipping': 'đang được vận chuyển',
-        'shipped': 'đã được giao',
-        'failed to ship': 'giao hàng thất bại',
-        'rejected': 'đã bị từ chối'
+        pending: "đang chờ xử lý",
+        processing: "đang được xử lý",
+        shipping: "đang được vận chuyển",
+        shipped: "đã được giao",
+        "failed to ship": "giao hàng thất bại",
+        rejected: "đã bị từ chối",
       };
 
       const emailSubject = `Cập nhật trạng thái đơn hàng #${orderId}`;
-      const emailText = `Kính gửi ${buyer.username},\n\nĐơn hàng #${orderId} của bạn đã được cập nhật trạng thái thành: ${statusMessages[status] || status}.\n\nTổng giá trị đơn hàng: ${order.totalPrice.toLocaleString('vi-VN')} VNĐ\n\nTrân trọng,\nShopii Team`;
+      const emailText = `Kính gửi ${buyer.username},\n\nĐơn hàng #${orderId} của bạn đã được cập nhật trạng thái thành: ${statusMessages[status] || status}.\n\nTổng giá trị đơn hàng: ${order.totalPrice.toLocaleString("vi-VN")} VNĐ\n\nTrân trọng,\nShopii Team`;
 
       try {
         await sendEmail(buyer.email, emailSubject, emailText);
       } catch (emailError) {
-        console.error('Error sending email notification:', emailError);
+        console.error("Error sending email notification:", emailError);
         // Don't fail the request if email fails
       }
     }
@@ -1129,7 +1183,15 @@ exports.updateOrderStatusAdmin = async (req, res) => {
  * @access Riêng tư (Admin)
  */
 exports.getAllReviewsAdmin = async (req, res) => {
-  const { productId, reviewerId, storeId, page = 1, limit = 10, search, rating } = req.query;
+  const {
+    productId,
+    reviewerId,
+    storeId,
+    page = 1,
+    limit = 10,
+    search,
+    rating,
+  } = req.query;
   try {
     let match = {};
     if (productId) match.productId = new mongoose.Types.ObjectId(productId);
@@ -1142,7 +1204,7 @@ exports.getAllReviewsAdmin = async (req, res) => {
           .status(404)
           .json({ success: false, message: "Cửa hàng không tồn tại" });
       const products = await Product.find({ sellerId: seller.sellerId }).select(
-        "_id"
+        "_id",
       );
       match.productId = { $in: products.map((p) => p._id) };
     }
@@ -1213,7 +1275,7 @@ exports.getAllReviewsAdmin = async (req, res) => {
 
     // For total we need to run a similar pipeline without skip/limit to count
     const countPipeline = pipeline.slice(0, -3); // remove sort/skip/limit
-    countPipeline.push({ $count: 'total' });
+    countPipeline.push({ $count: "total" });
     const countRes = await Review.aggregate(countPipeline);
     const total = countRes[0] ? countRes[0].total : 0;
 
@@ -1257,7 +1319,10 @@ exports.getAllDisputesAdmin = async (req, res) => {
   const { status, page = 1, limit = 10, search } = req.query;
   try {
     const query = {};
-    if (status && ["open", "under_review", "resolved", "closed"].includes(status)) {
+    if (
+      status &&
+      ["open", "under_review", "resolved", "closed"].includes(status)
+    ) {
       query.status = status;
     }
 
@@ -1265,10 +1330,12 @@ exports.getAllDisputesAdmin = async (req, res) => {
 
     // If search provided, attempt to match description, raisedBy username, or orderItemId
     if (search) {
-      const regex = new RegExp(search, 'i');
+      const regex = new RegExp(search, "i");
       // find users matching username
-      const users = await User.find({ username: { $regex: regex } }).select('_id');
-      const userIds = users.map(u => u._id);
+      const users = await User.find({ username: { $regex: regex } }).select(
+        "_id",
+      );
+      const userIds = users.map((u) => u._id);
       const orClauses = [{ description: { $regex: regex } }];
       if (userIds.length) orClauses.push({ raisedBy: { $in: userIds } });
       // if search looks like an ObjectId, include orderItemId match
@@ -1279,8 +1346,11 @@ exports.getAllDisputesAdmin = async (req, res) => {
     }
 
     const disputes = await Dispute.find(query)
-      .populate({ path: 'orderItemId', populate: { path: 'productId', select: 'title' } })
-      .populate({ path: 'raisedBy', select: 'username email' })
+      .populate({
+        path: "orderItemId",
+        populate: { path: "productId", select: "title" },
+      })
+      .populate({ path: "raisedBy", select: "username email" })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
@@ -1295,7 +1365,7 @@ exports.getAllDisputesAdmin = async (req, res) => {
       data: disputes,
     });
   } catch (error) {
-    handleError(res, error, 'Lỗi khi lấy danh sách khiếu nại');
+    handleError(res, error, "Lỗi khi lấy danh sách khiếu nại");
   }
 };
 
@@ -1311,14 +1381,19 @@ exports.updateDisputeByAdmin = async (req, res) => {
   try {
     const dispute = await Dispute.findById(disputeId);
     if (!dispute) {
-      return res.status(404).json({ success: false, message: 'Dispute not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Dispute not found" });
     }
 
     // Allow updating status and resolution directly
     const { status: newStatus, resolution: newResolution } = req.body;
 
     let changed = false;
-    if (newStatus && ["open", "under_review", "resolved", "closed"].includes(newStatus)) {
+    if (
+      newStatus &&
+      ["open", "under_review", "resolved", "closed"].includes(newStatus)
+    ) {
       dispute.status = newStatus;
       changed = true;
     }
@@ -1329,22 +1404,27 @@ exports.updateDisputeByAdmin = async (req, res) => {
     }
 
     // Support legacy 'close' action for backward compatibility
-    if (action === 'close') {
-      dispute.status = 'closed';
+    if (action === "close") {
+      dispute.status = "closed";
       if (note) {
-        dispute.resolution = `${dispute.resolution || ''}\n[Admin Note] ${note}`.trim();
+        dispute.resolution =
+          `${dispute.resolution || ""}\n[Admin Note] ${note}`.trim();
       }
       changed = true;
     }
 
     if (!changed) {
-      return res.status(400).json({ success: false, message: 'No valid update provided' });
+      return res
+        .status(400)
+        .json({ success: false, message: "No valid update provided" });
     }
 
     await dispute.save();
-    return res.status(200).json({ success: true, message: 'Dispute updated', data: dispute });
+    return res
+      .status(200)
+      .json({ success: true, message: "Dispute updated", data: dispute });
   } catch (error) {
-    handleError(res, error, 'Error updating dispute');
+    handleError(res, error, "Error updating dispute");
   }
 };
 
@@ -1356,11 +1436,13 @@ exports.updateDisputeByAdmin = async (req, res) => {
 exports.getAllSellerFeedbackAdmin = async (req, res) => {
   try {
     const feedbacks = await Feedback.find()
-      .populate('sellerId', 'username email')
+      .populate("sellerId", "username email")
       .sort({ updatedAt: -1 });
-    res.status(200).json({ success: true, count: feedbacks.length, data: feedbacks });
+    res
+      .status(200)
+      .json({ success: true, count: feedbacks.length, data: feedbacks });
   } catch (error) {
-    handleError(res, error, 'Lỗi khi lấy feedback của seller');
+    handleError(res, error, "Lỗi khi lấy feedback của seller");
   }
 };
 
@@ -1413,7 +1495,7 @@ exports.getProductReviewsAndStats = async (req, res) => {
     });
   } catch (error) {
     console.error(
-      `Error in getProductReviewsAndStats for product ID: ${id}: ${error.message}`
+      `Error in getProductReviewsAndStats for product ID: ${id}: ${error.message}`,
     );
     handleError(res, error, "Lỗi khi lấy đánh giá sản phẩm");
   }
@@ -1434,25 +1516,25 @@ exports.getAdminReport = async (req, res) => {
           from: "categories",
           localField: "categoryId",
           foreignField: "_id",
-          as: "category"
-        }
+          as: "category",
+        },
       },
       { $unwind: "$category" },
       {
         $group: {
           _id: "$category._id",
           name: { $first: "$category.name" },
-          count: { $sum: 1 }
-        }
+          count: { $sum: 1 },
+        },
       },
       { $sort: { count: -1 } },
       {
         $project: {
           _id: 0,
           name: 1,
-          count: 1
-        }
-      }
+          count: 1,
+        },
+      },
     ]);
 
     if (period === "week") {
@@ -1761,7 +1843,7 @@ exports.getAdminReport = async (req, res) => {
               type: "New User",
               details: d.username,
               createdAt: d.createdAt,
-            }))
+            })),
           ),
         Order.find(dateFilter)
           .select("totalPrice createdAt")
@@ -1773,7 +1855,7 @@ exports.getAdminReport = async (req, res) => {
               type: "New Order",
               details: `Total: ${d.totalPrice}`,
               createdAt: d.createdAt,
-            }))
+            })),
           ),
         Product.find(dateFilter)
           .select("title createdAt")
@@ -1785,13 +1867,13 @@ exports.getAdminReport = async (req, res) => {
               type: "New Product",
               details: d.title,
               createdAt: d.createdAt,
-            }))
+            })),
           ),
       ]).then((results) =>
         results
           .flat()
           .sort((a, b) => b.createdAt - a.createdAt)
-          .slice(0, 10)
+          .slice(0, 10),
       ),
       // Đếm active seller và buyer từ danh sách ID
       User.countDocuments({ role: "seller", _id: { $in: activeSellerIds } }),
@@ -1888,26 +1970,31 @@ exports.getAdminReport = async (req, res) => {
 exports.createAdminUser = async (req, res) => {
   try {
     const { username, email, password, fullname, role } = req.body;
-    const bcrypt = require('bcryptjs');
+    const bcrypt = require("bcryptjs");
 
     // Validate input
     if (!username || !email || !password) {
-      return res.status(400).json({ success: false, message: "Username, email, và password là bắt buộc" });
+      return res.status(400).json({
+        success: false,
+        message: "Username, email, và password là bắt buộc",
+      });
     }
 
     // Check if role is valid admin role
-    const validAdminRoles = ['admin', 'monitor', 'support', 'finance'];
+    const validAdminRoles = ["admin", "monitor", "support", "finance"];
     if (!role || !validAdminRoles.includes(role)) {
       return res.status(400).json({
         success: false,
-        message: `Vai trò phải là một trong: ${validAdminRoles.join(', ')}`
+        message: `Vai trò phải là một trong: ${validAdminRoles.join(", ")}`,
       });
     }
 
     // Check if user already exists
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
-      return res.status(400).json({ success: false, message: "Username hoặc email đã tồn tại" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Username hoặc email đã tồn tại" });
     }
 
     // Hash password
@@ -1921,7 +2008,7 @@ exports.createAdminUser = async (req, res) => {
       password: hashedPassword,
       fullname: fullname || username,
       role: role, // admin, monitor, support, finance
-      action: 'unlock', // Default unlocked
+      action: "unlock", // Default unlocked
     });
 
     await newUser.save();
@@ -1934,7 +2021,7 @@ exports.createAdminUser = async (req, res) => {
         username: newUser.username,
         email: newUser.email,
         role: newUser.role,
-      }
+      },
     });
   } catch (error) {
     handleError(res, error, "Lỗi tạo admin user", 500);
@@ -1948,51 +2035,102 @@ exports.createAdminUser = async (req, res) => {
  */
 exports.updateUserRole = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const { role } = req.body;
+    const requesterRole = req.user?.role;
 
-    if (!role) {
-      return res.status(400).json({ success: false, message: "Vai trò là bắt buộc" });
-    }
-
-    // All valid roles (including new admin roles)
-    const validRoles = ['buyer', 'seller', 'admin', 'monitor', 'support', 'finance'];
-    if (!validRoles.includes(role)) {
-      return res.status(400).json({
+    // Chỉ admin và support được đổi role
+    if (!["admin", "support"].includes(requesterRole)) {
+      return res.status(403).json({
         success: false,
-        message: `Vai trò phải là một trong: ${validRoles.join(', ')}`
+        message:
+          "Chỉ tài khoản Admin hoặc Support mới được phép thay đổi vai trò.",
       });
     }
 
-    // Find and update user
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { role },
-      { new: true }
-    );
+    const { userId } = req.params;
+    const { role } = req.body;
 
-    if (!user) {
-      return res.status(404).json({ success: false, message: "Không tìm thấy người dùng" });
+    const validRoles = [
+      "buyer",
+      "seller",
+      "admin",
+      "monitor",
+      "support",
+      "finance",
+    ];
+
+    // Kiểm tra role gửi lên
+    if (!role) {
+      return res.status(400).json({
+        success: false,
+        message: "Vai trò là bắt buộc.",
+      });
     }
 
-    res.json({
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: `Vai trò phải là một trong: ${validRoles.join(", ")}`,
+      });
+    }
+
+    // Tìm user cần đổi role
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy người dùng.",
+      });
+    }
+
+    const previousRole = user.role;
+
+    // Nếu role không thay đổi
+    if (previousRole === role) {
+      return res.status(200).json({
+        success: true,
+        message: "Vai trò người dùng không thay đổi.",
+        data: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+        },
+      });
+    }
+
+    // Cập nhật role
+    user.role = role;
+    await user.save();
+
+    // Ghi audit log
+    await createAuditLog({
+      admin: req.user.id,
+      action: AUDIT.USER_UPDATE,
+      targetType: "User",
+      targetId: user._id,
+      description: `Đổi vai trò người dùng ${user.email}: ${previousRole} → ${role}`,
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
+
+    return res.status(200).json({
       success: true,
-      message: `Vai trò người dùng đã được cập nhật thành ${role}`,
-      user: {
+      message: `Vai trò người dùng đã được cập nhật từ ${previousRole} thành ${role}.`,
+      data: {
         id: user._id,
         username: user.username,
         email: user.email,
         role: user.role,
-      }
+      },
     });
   } catch (error) {
-    handleError(res, error, "Lỗi cập nhật vai trò người dùng", 500);
+    return handleError(res, error, "Lỗi cập nhật vai trò người dùng", 500);
   }
 };
 
 exports.getAuditLogs = async (req, res) => {
   try {
-
     const logs = await AuditLog.find()
       .populate("admin", "fullname email")
       .sort({ createdAt: -1 });
@@ -2001,22 +2139,20 @@ exports.getAuditLogs = async (req, res) => {
       success: true,
       data: logs,
     });
-
   } catch (err) {
-
     res.status(500).json({
       success: false,
       message: err.message,
     });
   }
-}
+};
 
 /**
  * @desc Send email to users (all, all admins, or specific users). Supports scheduled send.
  * @route POST /api/admin/send-email
  * @access Private (Admin)
  */
-const cron = require('node-cron');
+const cron = require("node-cron");
 const scheduledEmailJobs = {}; // In-memory store for scheduled jobs
 
 exports.sendAdminEmail = async (req, res) => {
@@ -2024,26 +2160,38 @@ exports.sendAdminEmail = async (req, res) => {
     const { recipients, subject, body, sendMode, scheduledAt } = req.body;
 
     if (!subject || !body) {
-      return res.status(400).json({ success: false, message: 'Subject and body are required.' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Subject and body are required." });
     }
-    if (!recipients || !['all', 'admins', 'specific'].includes(recipients.type)) {
-      return res.status(400).json({ success: false, message: 'Invalid recipients type.' });
+    if (
+      !recipients ||
+      !["all", "admins", "specific"].includes(recipients.type)
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid recipients type." });
     }
 
     // Resolve recipient emails
     let emails = [];
-    if (recipients.type === 'all') {
-      const users = await User.find({}, 'email').lean();
-      emails = users.map(u => u.email).filter(Boolean);
-    } else if (recipients.type === 'admins') {
-      const admins = await User.find({ role: { $in: ['admin', 'monitor', 'support', 'finance'] } }, 'email').lean();
-      emails = admins.map(u => u.email).filter(Boolean);
-    } else if (recipients.type === 'specific') {
+    if (recipients.type === "all") {
+      const users = await User.find({}, "email").lean();
+      emails = users.map((u) => u.email).filter(Boolean);
+    } else if (recipients.type === "admins") {
+      const admins = await User.find(
+        { role: { $in: ["admin", "monitor", "support", "finance"] } },
+        "email",
+      ).lean();
+      emails = admins.map((u) => u.email).filter(Boolean);
+    } else if (recipients.type === "specific") {
       emails = (recipients.emails || []).filter(Boolean);
     }
 
     if (emails.length === 0) {
-      return res.status(400).json({ success: false, message: 'No recipients found.' });
+      return res
+        .status(400)
+        .json({ success: false, message: "No recipients found." });
     }
 
     const doSend = async () => {
@@ -2058,7 +2206,7 @@ exports.sendAdminEmail = async (req, res) => {
       return errors;
     };
 
-    if (sendMode === 'immediate' || !sendMode) {
+    if (sendMode === "immediate" || !sendMode) {
       const errors = await doSend();
       return res.status(200).json({
         success: true,
@@ -2069,11 +2217,17 @@ exports.sendAdminEmail = async (req, res) => {
 
     // Scheduled send
     if (!scheduledAt) {
-      return res.status(400).json({ success: false, message: 'scheduledAt is required for scheduled sends.' });
+      return res.status(400).json({
+        success: false,
+        message: "scheduledAt is required for scheduled sends.",
+      });
     }
     const sendTime = new Date(scheduledAt);
     if (isNaN(sendTime.getTime()) || sendTime <= new Date()) {
-      return res.status(400).json({ success: false, message: 'scheduledAt must be a future date.' });
+      return res.status(400).json({
+        success: false,
+        message: "scheduledAt must be a future date.",
+      });
     }
 
     // Build cron expression from sendTime
@@ -2084,13 +2238,22 @@ exports.sendAdminEmail = async (req, res) => {
     const cronExpr = `${minute} ${hour} ${day} ${month} *`;
 
     const jobId = `email_job_${Date.now()}`;
-    const task = cron.schedule(cronExpr, async () => {
-      await doSend();
-      task.stop();
-      delete scheduledEmailJobs[jobId];
-    }, { scheduled: true, timezone: 'Asia/Ho_Chi_Minh' });
+    const task = cron.schedule(
+      cronExpr,
+      async () => {
+        await doSend();
+        task.stop();
+        delete scheduledEmailJobs[jobId];
+      },
+      { scheduled: true, timezone: "Asia/Ho_Chi_Minh" },
+    );
 
-    scheduledEmailJobs[jobId] = { task, scheduledAt: sendTime, subject, emails };
+    scheduledEmailJobs[jobId] = {
+      task,
+      scheduledAt: sendTime,
+      subject,
+      emails,
+    };
 
     return res.status(200).json({
       success: true,
@@ -2098,6 +2261,6 @@ exports.sendAdminEmail = async (req, res) => {
       jobId,
     });
   } catch (error) {
-    handleError(res, error, 'Lỗi gửi email', 500);
+    handleError(res, error, "Lỗi gửi email", 500);
   }
-}
+};
