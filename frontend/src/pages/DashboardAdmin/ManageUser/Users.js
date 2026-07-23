@@ -168,9 +168,8 @@ export default function Users({
         `http://localhost:9999/api/admin/users/${deletingUser._id}`,
         {
           headers: {
-            Authorization: `Bearer ${
-              localStorage.getItem("accessToken") || ""
-            }`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken") || ""
+              }`,
           },
           params: { skipAuth: true }, // Chỉ dùng nếu backend xử lý skipAuth
         },
@@ -191,9 +190,8 @@ export default function Users({
       console.error("Delete error:", error.response || error);
       setSnackbar({
         open: true,
-        msg: `Error deleting user! ${
-          error.response?.data?.message || error.message
-        }`,
+        msg: `Error deleting user! ${error.response?.data?.message || error.message
+          }`,
         severity: "error",
       });
       setDeletingUser(null);
@@ -328,9 +326,8 @@ export default function Users({
       console.error("Lock/Unlock error:", error);
       setSnackbar({
         open: true,
-        msg: `Error ${action === "lock" ? "locking" : "unlocking"} user! ${
-          error.response?.data?.message || error.message
-        }`,
+        msg: `Error ${action === "lock" ? "locking" : "unlocking"} user! ${error.response?.data?.message || error.message
+          }`,
         severity: "error",
       });
     } finally {
@@ -362,9 +359,8 @@ export default function Users({
         },
         {
           headers: {
-            Authorization: `Bearer ${
-              localStorage.getItem("accessToken") || ""
-            }`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken") || ""
+              }`,
           },
         },
       );
@@ -372,9 +368,8 @@ export default function Users({
       if (response.status === 200) {
         setSnackbar({
           open: true,
-          msg: `Đã đổi role của ${
-            user.username || user.email
-          } thành ${newRole}.`,
+          msg: `Đã đổi role của ${user.username || user.email
+            } thành ${newRole}.`,
           severity: "success",
         });
 
@@ -424,9 +419,8 @@ export default function Users({
       console.error("Approve error:", error);
       setSnackbar({
         open: true,
-        msg: `Lỗi khi ${approved ? "duyệt" : "từ chối"} tài khoản! ${
-          error.response?.data?.message || error.message
-        }`,
+        msg: `Lỗi khi ${approved ? "duyệt" : "từ chối"} tài khoản! ${error.response?.data?.message || error.message
+          }`,
         severity: "error",
       });
     } finally {
@@ -1035,30 +1029,30 @@ export default function Users({
                               }}
                             >
                               {!isReadOnly &&
-                                (user.action === "unlock" ? (
+                                (user.action !== "lock" ? (
                                   <Tooltip title="Lock Account">
                                     <IconButton
                                       size="small"
-                                      color="warning"
+                                      color="success"
                                       onClick={() =>
                                         handleLockUnlock(user, "lock")
                                       }
                                       disabled={loading}
                                     >
-                                      <LockPersonIcon fontSize="small" />
+                                      <LockOpenIcon fontSize="small" />
                                     </IconButton>
                                   </Tooltip>
                                 ) : (
                                   <Tooltip title="Unlock Account">
                                     <IconButton
                                       size="small"
-                                      color="success"
+                                      color="error"
                                       onClick={() =>
                                         handleLockUnlock(user, "unlock")
                                       }
                                       disabled={loading}
                                     >
-                                      <LockOpenIcon fontSize="small" />
+                                      <LockPersonIcon fontSize="small" />
                                     </IconButton>
                                   </Tooltip>
                                 ))}

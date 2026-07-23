@@ -310,7 +310,7 @@ exports.updateUserByAdmin = async (req, res) => {
     const previousRole = user.role;
 
     let auditAction = AUDIT.USER_UPDATE;
-    let auditDescription = `Cập nhật thông tin người dùng ${user.username}`;
+    let auditDescription = `Updated user info for ${user.email || user.username}`;
 
     if (username !== undefined && username.trim()) {
       user.username = username.trim();
@@ -322,9 +322,8 @@ exports.updateUserByAdmin = async (req, res) => {
 
     if (role !== undefined && role !== previousRole) {
       user.role = role;
-      auditDescription =
-        `Đổi vai trò người dùng ${user.username}: ` +
-        `${previousRole} → ${role}`;
+      auditAction = AUDIT.USER_CHANGE_ROLE;
+      auditDescription = `Changed user role for ${user.email || user.username} from ${previousRole.toUpperCase()} to ${role.toUpperCase()}`;
     }
 
     if (action && ["lock", "unlock"].includes(action)) {
@@ -332,7 +331,7 @@ exports.updateUserByAdmin = async (req, res) => {
 
       if (action === "lock") {
         auditAction = AUDIT.USER_LOCK;
-        auditDescription = `Khóa người dùng ${user.username}`;
+        auditDescription = `Locked user ${user.email || user.username}`;
 
         if (user.role === "seller") {
           const store = await Store.findOne({ sellerId: user._id });
@@ -357,7 +356,7 @@ exports.updateUserByAdmin = async (req, res) => {
         }
       } else {
         auditAction = AUDIT.USER_UNLOCK;
-        auditDescription = `Mở khóa người dùng ${user.username}`;
+        auditDescription = `Unlocked user ${user.email || user.username}`;
       }
 
       if (action !== previousAction && user.email) {
@@ -389,9 +388,9 @@ exports.updateUserByAdmin = async (req, res) => {
       targetType: "User",
       targetId: user._id,
       description: auditDescription,
-      ip: req.ip,
-      userAgent: req.headers["user-agent"],
-    });
+      oldValue: { role: previousRole, action: previousAction },
+      newValue: { role: user.role, action: user.action },
+    }, req);
 
     const userToReturn = user.toObject();
     delete userToReturn.password;
@@ -537,71 +536,84 @@ exports.updateStoreStatusByAdmin = async (req, res) => {
           await seller.save();
         }
       }
-    } else if (status === "rejected") {
-      auditAction = AUDIT.STORE_REJECT;
-    }
+      if (status === "approved") {
+        auditAction = AUDIT.STORE_APPROVE;
+        auditDescription = `Approved shop ${store.storeName}`;
+      } else if (status === "rejected") {
+        auditAction = AUDIT.STORE_REJECT;
+        auditDescription = `Rejected shop ${store.storeName}`;
+      } else if (status === "locked") {
+        auditAction = "STORE_LOCK";
+        auditDescription = `Locked shop ${store.storeName}`;
+      } else if (status === "active") {
+        auditAction = "STORE_UNLOCK";
+        auditDescription = `Unlocked shop ${store.storeName}`;
+      } else {
+        auditDescription = `Updated shop ${store.storeName} status to ${status}`;
+      }
 
-    store.status = status;
-    await store.save();
+      store.status = status;
+      await store.save();
 
-    await createAuditLog({
-      admin: req.user.id,
-      action: auditAction,
-      targetType: "Store",
-      targetId: store._id,
-      description: `Updated store "${store.storeName}" (status: ${previousStatus} → ${status})`,
-      ip: req.ip,
-      userAgent: req.headers["user-agent"],
-    });
+      await createAuditLog({
+        admin: req.user.id,
+        action: auditAction,
+        targetType: "Shop",
+        targetId: store._id,
+        description: auditDescription,
+        oldValue: { status: previousStatus },
+        newValue: { status: status },
+      }, req);
 
-    if (status !== previousStatus) {
-      const seller = await User.findById(store.sellerId);
+      if (status !== previousStatus) {
+        const seller = await User.findById(store.sellerId);
 
-      if (seller) {
-        let emailSubject;
-        let emailText;
+        if (seller) {
+          let emailSubject;
+          let emailText;
 
-        switch (status) {
-          case "approved":
-            emailSubject = "Cửa hàng của bạn đã được duyệt";
-            emailText = `Kính gửi ${seller.username},
+          switch (status) {
+            case "approved":
+              emailSubject = "Cửa hàng của bạn đã được duyệt";
+              emailText = `Kính gửi ${seller.username},
 
 Cửa hàng "${store.storeName}" đã được duyệt.
 
 Trân trọng,
 Shopii Team`;
-            break;
+              break;
 
-          case "rejected":
-            emailSubject = "Cửa hàng của bạn đã bị từ chối";
-            emailText = `Kính gửi ${seller.username},
+            case "rejected":
+              emailSubject = "Cửa hàng của bạn đã bị từ chối";
+              emailText = `Kính gửi ${seller.username},
 
 Cửa hàng "${store.storeName}" đã bị từ chối.
 
 Trân trọng,
 Shopii Team`;
-            break;
+              break;
 
-          case "pending":
-            emailSubject = "Cửa hàng đang chờ duyệt";
-            emailText = `Kính gửi ${seller.username},
+            case "pending":
+              emailSubject = "Cửa hàng đang chờ duyệt";
+              emailText = `Kính gửi ${seller.username},
 
 Cửa hàng "${store.storeName}" đang ở trạng thái chờ duyệt.
 
 Trân trọng,
 Shopii Team`;
-            break;
+              break;
+          }
+
+          await sendEmail(seller.email, emailSubject, emailText);
         }
-
-        await sendEmail(seller.email, emailSubject, emailText);
       }
-    }
 
-    res.status(200).json({
-      success: true,
-      message: `Cập nhật trạng thái cửa hàng thành công`,
-      data: store,
-    });
+      res.status(200).json({
+        success: true,
+        message: `Cập nhật trạng thái cửa hàng thành công`,
+        data: store,
+      });
+    }
   } catch (error) {
     handleError(res, error, "Lỗi khi cập nhật trạng thái cửa hàng");
   }
@@ -1138,9 +1150,26 @@ exports.updateOrderStatusAdmin = async (req, res) => {
         .json({ success: false, message: "Đơn hàng không tồn tại" });
     }
 
-    // Update order status
+    const previousStatus = order.status;
     order.status = status;
     await order.save();
+
+    let actionName = "ORDER_STATUS_UPDATE";
+    let desc = `Changed order #${orderId} status to ${status.toUpperCase()}`;
+    if (status === "rejected" || status === "cancelled") {
+      actionName = "ORDER_CANCEL";
+      desc = `Cancelled order #${orderId}`;
+    }
+
+    await createAuditLog({
+      admin: req.user?.id,
+      action: actionName,
+      targetType: "Order",
+      targetId: order._id,
+      description: desc,
+      oldValue: { status: previousStatus },
+      newValue: { status: status },
+    }, req);
 
     // Get buyer info for email notification
     const buyer = await User.findById(order.buyerId).select("email username");
@@ -1956,6 +1985,13 @@ exports.getAdminReport = async (req, res) => {
         recentActivity,
       },
     });
+
+    await createAuditLog({
+      admin: req.user?.id,
+      action: "SYSTEM_EXPORT_REPORT",
+      targetType: "System",
+      description: "Exported admin system report",
+    }, req);
   } catch (error) {
     handleError(res, error, "Lỗi khi lấy báo cáo dashboard");
   }
@@ -2131,13 +2167,113 @@ exports.updateUserRole = async (req, res) => {
 
 exports.getAuditLogs = async (req, res) => {
   try {
-    const logs = await AuditLog.find()
-      .populate("admin", "fullname email")
+    const {
+      search,
+      action,
+      status,
+      targetType,
+      dateRange,
+      startDate,
+      endDate,
+      page,
+      limit,
+    } = req.query;
+
+    const query = {};
+
+    // Action filter
+    if (action && action !== "ALL") {
+      query.action = action;
+    }
+
+    // Status filter
+    if (status && status !== "ALL") {
+      query.status = status.toUpperCase();
+    }
+
+    // Target Type filter
+    if (targetType && targetType !== "ALL") {
+      query.targetType = new RegExp(`^${targetType}$`, "i");
+    }
+
+    // Date Range filter
+    if (dateRange && dateRange !== "ALL") {
+      const now = new Date();
+      let start = null;
+      let end = new Date();
+
+      if (dateRange === "today") {
+        start = new Date();
+        start.setHours(0, 0, 0, 0);
+      } else if (dateRange === "7days") {
+        start = new Date();
+        start.setDate(now.getDate() - 7);
+      } else if (dateRange === "30days") {
+        start = new Date();
+        start.setDate(now.getDate() - 30);
+      } else if (dateRange === "custom" && startDate) {
+        start = new Date(startDate);
+        if (endDate) {
+          end = new Date(endDate);
+          end.setHours(23, 59, 59, 999);
+        }
+      }
+
+      if (start) {
+        query.createdAt = { $gte: start, $lte: end };
+      }
+    }
+
+    // Search keyword
+    if (search && search.trim()) {
+      const term = search.trim();
+      const searchRegex = new RegExp(term, "i");
+
+      // Find matching user IDs
+      const matchingUsers = await User.find({
+        $or: [{ username: searchRegex }, { email: searchRegex }, { fullname: searchRegex }],
+      }).select("_id");
+      const userIds = matchingUsers.map((u) => u._id);
+
+      query.$or = [
+        { adminName: searchRegex },
+        { adminEmail: searchRegex },
+        { action: searchRegex },
+        { targetType: searchRegex },
+        { targetId: searchRegex },
+        { description: searchRegex },
+        { ip: searchRegex },
+        { ipAddress: searchRegex },
+        { admin: { $in: userIds } },
+        { adminId: { $in: userIds } },
+      ];
+    }
+
+    let logsQuery = AuditLog.find(query)
+      .populate("admin", "username fullname email role")
+      .populate("adminId", "username fullname email role")
       .sort({ createdAt: -1 });
 
-    res.json({
+    if (page && limit) {
+      const p = parseInt(page, 10) || 1;
+      const l = parseInt(limit, 10) || 10;
+      const total = await AuditLog.countDocuments(query);
+      const logs = await logsQuery.skip((p - 1) * l).limit(l);
+
+      return res.json({
+        success: true,
+        data: logs,
+        total,
+        totalPages: Math.ceil(total / l),
+        currentPage: p,
+      });
+    }
+
+    const logs = await logsQuery;
+    return res.json({
       success: true,
       data: logs,
+      total: logs.length,
     });
   } catch (err) {
     res.status(500).json({
@@ -2208,6 +2344,12 @@ exports.sendAdminEmail = async (req, res) => {
 
     if (sendMode === "immediate" || !sendMode) {
       const errors = await doSend();
+      await createAuditLog({
+        admin: req.user?.id,
+        action: "SYSTEM_UPDATE_SETTINGS",
+        targetType: "System",
+        description: `Sent announcement email "${subject}" to ${emails.length} recipients`,
+      }, req);
       return res.status(200).json({
         success: true,
         message: `Email sent to ${emails.length - errors.length}/${emails.length} recipients.`,

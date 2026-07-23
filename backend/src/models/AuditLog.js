@@ -5,7 +5,19 @@ const auditLogSchema = new mongoose.Schema(
     admin: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+    },
+
+    adminId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+
+    adminEmail: {
+      type: String,
+    },
+
+    adminName: {
+      type: String,
     },
 
     action: {
@@ -19,19 +31,57 @@ const auditLogSchema = new mongoose.Schema(
     },
 
     targetId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.Mixed,
     },
 
     description: {
       type: String,
     },
 
+    status: {
+      type: String,
+      enum: ["SUCCESS", "FAILED"],
+      default: "SUCCESS",
+    },
+
     ip: {
+      type: String,
+    },
+
+    ipAddress: {
+      type: String,
+    },
+
+    endpoint: {
+      type: String,
+    },
+
+    httpMethod: {
+      type: String,
+    },
+
+    browser: {
+      type: String,
+    },
+
+    operatingSystem: {
+      type: String,
+    },
+
+    device: {
       type: String,
     },
 
     userAgent: {
       type: String,
+    },
+
+    oldValue: {
+      type: mongoose.Schema.Types.Mixed,
+    },
+
+    newValue: {
+      type: mongoose.Schema.Types.Mixed,
     },
   },
   {

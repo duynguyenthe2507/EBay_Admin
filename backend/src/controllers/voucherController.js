@@ -1,4 +1,6 @@
 const Voucher = require('../models/Voucher');
+const { createAuditLog } = require('../services/auditLogService');
+const AUDIT = require('../constants/auditActions');
 
 // @desc    Create a new voucher
 // @route   POST /api/vouchers
@@ -17,6 +19,16 @@ const createVoucher = async (req, res, next) => {
     });
 
     const createdVoucher = await voucher.save();
+
+    await createAuditLog({
+      admin: req.user?.id,
+      action: "COUPON_CREATE",
+      targetType: "Voucher",
+      targetId: createdVoucher._id,
+      description: `Created voucher ${createdVoucher.code}`,
+      newValue: createdVoucher,
+    }, req);
+
     res.status(201).json(createdVoucher);
   } catch (error) {
     next(error);
@@ -71,6 +83,16 @@ const updateVoucher = async (req, res, next) => {
       voucher.isActive = isActive !== undefined ? isActive : voucher.isActive;
 
       const updatedVoucher = await voucher.save();
+
+      await createAuditLog({
+        admin: req.user?.id,
+        action: "COUPON_UPDATE",
+        targetType: "Voucher",
+        targetId: updatedVoucher._id,
+        description: `Updated voucher ${updatedVoucher.code}`,
+        newValue: updatedVoucher,
+      }, req);
+
       res.json(updatedVoucher);
     } else {
       res.status(404).json({ message: 'Voucher not found' });
@@ -89,6 +111,16 @@ const deleteVoucher = async (req, res, next) => {
 
     if (voucher) {
       await voucher.remove();
+
+      await createAuditLog({
+        admin: req.user?.id,
+        action: "COUPON_DELETE",
+        targetType: "Voucher",
+        targetId: voucher._id,
+        description: `Deleted voucher ${voucher.code}`,
+        oldValue: voucher,
+      }, req);
+
       res.json({ message: 'Voucher removed' });
     } else {
       res.status(404).json({ message: 'Voucher not found' });
@@ -161,5 +193,5 @@ module.exports = {
   deleteVoucher,
   toggleVoucherActive,
   getVoucherByCode, // Thêm hàm mới vào đây
-  
+
 };

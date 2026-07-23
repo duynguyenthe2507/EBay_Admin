@@ -1,36 +1,106 @@
 const AuditLog = require("../models/AuditLog");
 
-console.log("AuditLog:", AuditLog);
-console.log("typeof AuditLog:", typeof AuditLog);
-console.log("typeof AuditLog.create:", typeof AuditLog.create);
+function parseUserAgent(uaString = "") {
+  if (!uaString) {
+    return { browser: "Unknown", operatingSystem: "Unknown", device: "Desktop" };
+  }
 
-exports.createAuditLog = async ({
-  admin,
-  action,
-  targetType,
-  targetId,
-  description,
-  ip,
-  userAgent,
-}) => {
+  let browser = "Unknown";
+  let operatingSystem = "Unknown";
+  let device = "Desktop";
 
-  console.log({
-    admin,
-    action,
-    targetType,
-    targetId,
-    description,
-    ip,
-    userAgent,
-  });
+  // Operating System
+  if (/windows/i.test(uaString)) operatingSystem = "Windows";
+  else if (/macintosh|mac os x/i.test(uaString)) operatingSystem = "macOS";
+  else if (/linux/i.test(uaString)) operatingSystem = "Linux";
+  else if (/android/i.test(uaString)) operatingSystem = "Android";
+  else if (/iphone|ipad|ipod/i.test(uaString)) operatingSystem = "iOS";
 
-  return await AuditLog.create({
-    admin,
-    action,
-    targetType,
-    targetId,
-    description,
-    ip,
-    userAgent,
-  });
+  // Device
+  if (/mobile/i.test(uaString)) device = "Mobile";
+  else if (/tablet|ipad/i.test(uaString)) device = "Tablet";
+  else device = "Desktop";
+
+  // Browser
+  if (/edg/i.test(uaString)) browser = "Edge";
+  else if (/chrome|crios/i.test(uaString)) browser = "Chrome";
+  else if (/firefox|fxios/i.test(uaString)) browser = "Firefox";
+  else if (/safari/i.test(uaString) && !/chrome/i.test(uaString)) browser = "Safari";
+  else if (/opera|opr/i.test(uaString)) browser = "Opera";
+
+  return { browser, operatingSystem, device };
+}
+
+function getIpAddress(req) {
+  if (!req) return "";
+  const forwarded = req.headers ? req.headers["x-forwarded-for"] : null;
+  if (forwarded) {
+    return forwarded.split(",")[0].trim();
+  }
+  return req.ip || req.connection?.remoteAddress || req.socket?.remoteAddress || "";
+}
+
+exports.createAuditLog = async (data = {}, req = null) => {
+  try {
+    let adminObjId = data.admin || data.adminId;
+    let adminEmail = data.adminEmail;
+    let adminName = data.adminName;
+    let userAgentStr = data.userAgent;
+    let ipAddr = data.ipAddress || data.ip;
+    let endpoint = data.endpoint;
+    let httpMethod = data.httpMethod;
+
+    if (req) {
+      if (!adminObjId && req.user) {
+        adminObjId = req.user.id || req.user._id;
+      }
+      if (!adminEmail && req.user?.email) {
+        adminEmail = req.user.email;
+      }
+      if (!adminName && req.user) {
+        adminName = req.user.username || req.user.fullname || req.user.email || "";
+      }
+      if (!userAgentStr && req.headers) {
+        userAgentStr = req.headers["user-agent"] || "";
+      }
+      if (!ipAddr) {
+        ipAddr = getIpAddress(req);
+      }
+      if (!endpoint) {
+        endpoint = req.originalUrl || req.url || "";
+      }
+      if (!httpMethod) {
+        httpMethod = req.method || "";
+      }
+    }
+
+    const { browser, operatingSystem, device } = parseUserAgent(userAgentStr);
+
+    const logPayload = {
+      admin: adminObjId || null,
+      adminId: adminObjId || null,
+      adminEmail: adminEmail || "",
+      adminName: adminName || "",
+      action: data.action || "UNKNOWN",
+      targetType: data.targetType || "System",
+      targetId: data.targetId ? String(data.targetId) : "",
+      description: data.description || "",
+      status: data.status ? data.status.toUpperCase() : "SUCCESS",
+      ip: ipAddr || "127.0.0.1",
+      ipAddress: ipAddr || "127.0.0.1",
+      endpoint: endpoint || "",
+      httpMethod: httpMethod || "",
+      browser: data.browser || browser,
+      operatingSystem: data.operatingSystem || operatingSystem,
+      device: data.device || device,
+      userAgent: userAgentStr || "",
+      oldValue: data.oldValue !== undefined ? data.oldValue : null,
+      newValue: data.newValue !== undefined ? data.newValue : null,
+    };
+
+    return await AuditLog.create(logPayload);
+  } catch (error) {
+    console.error("Error creating audit log:", error);
+    return null;
+  }
 };
