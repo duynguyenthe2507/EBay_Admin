@@ -9,7 +9,7 @@
     "storeName": "Jane's Electronics",
     "description": "Quality electronic products at affordable prices",
     "bannerImageURL": "https://eastatlanticnetwork.com/wp-content/uploads/2023/08/Sales-and-installations-of-electronics-600x434.jpg",
-    "status": "approved",
+    "status": "pending",
     "createdAt": {
       "$date": "2023-06-22T10:00:00.000Z"
     },
@@ -27,7 +27,7 @@
     "storeName": "Seed Demo Store",
     "description": "Additional demo store created for seeding validation",
     "bannerImageURL": "https://example.com/banners/seed-demo-store.jpg",
-    "status": "approved",
+    "status": "pending",
     "createdAt": {
       "$date": "2026-07-23T08:45:00.000Z"
     },
@@ -45,7 +45,7 @@
     "storeName": "Seed Store 1",
     "description": "Seed storefront 1",
     "bannerImageURL": "https://example.com/stores/seed-1.jpg",
-    "status": "approved",
+    "status": "pending",
     "createdAt": {
       "$date": "2026-07-23T17:10:19.028Z"
     },
@@ -63,7 +63,7 @@
     "storeName": "Seed Store 2",
     "description": "Seed storefront 2",
     "bannerImageURL": "https://example.com/stores/seed-2.jpg",
-    "status": "approved",
+    "status": "pending",
     "createdAt": {
       "$date": "2026-07-23T17:40:19.028Z"
     },
@@ -81,7 +81,7 @@
     "storeName": "Seed Store 3",
     "description": "Seed storefront 3",
     "bannerImageURL": "https://example.com/stores/seed-3.jpg",
-    "status": "approved",
+    "status": "pending",
     "createdAt": {
       "$date": "2026-07-23T18:10:19.028Z"
     },

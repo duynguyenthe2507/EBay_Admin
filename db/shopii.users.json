@@ -208,5 +208,25 @@
       "$date": "2026-07-23T21:10:19.028Z"
     },
     "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000135"
+    },
+    "username": "huynq",
+    "fullname": "huy nguyen",
+    "email": "ngquanghuy.work@gmail.com",
+    "password": "$2b$10$65Ex5GqnRiem2XBERex2AuI8hh5TUrIXADpWmMzZgjEdaE1QRSIzG",
+    "role": "buyer",
+    "avatarURL": "https://example.com/avatars/seed5.jpg",
+    "action": "unlock",
+    "accountStatus": "approved",
+    "createdAt": {
+      "$date": "2026-07-23T21:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T21:10:19.028Z"
+    },
+    "__v": 0
   }
 ]

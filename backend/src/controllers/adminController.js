@@ -481,9 +481,9 @@ exports.getStoreDetails = async (req, res) => {
 };
 
 /**
- * @desc Cập nhật trạng thái cửa hàng (duyệt, từ chối)
+ * @desc Cập nhật trạng thái cửa hàng (duyệt, từ chối, pending)
  * @route PUT /api/admin/stores/:storeId/status
- * @access Riêng tư (Admin)
+ * @access Riêng tư (Admin, Support)
  */
 exports.updateStoreStatusByAdmin = async (req, res) => {
   const { storeId } = req.params;
@@ -509,52 +509,49 @@ exports.updateStoreStatusByAdmin = async (req, res) => {
 
     const previousStatus = store.status;
 
-    let auditAction = AUDIT.STORE_UPDATE;
+    // --- Handle approved: promote buyer → seller ---
+    if (status === "approved" && store.sellerId) {
+      const seller = await User.findById(store.sellerId);
 
-    if (status === "approved") {
-      auditAction = AUDIT.STORE_APPROVE;
-
-      if (store.sellerId) {
-        const seller = await User.findById(store.sellerId);
-
-        if (!seller) {
-          return res.status(404).json({
-            success: false,
-            message: "Người dùng không tồn tại",
-          });
-        }
-
-        if (seller.action === "lock") {
-          return res.status(400).json({
-            success: false,
-            message: "Không thể duyệt cửa hàng khi người dùng bị khóa",
-          });
-        }
-
-        if (seller.role === "buyer") {
-          seller.role = "seller";
-          await seller.save();
-        }
+      if (!seller) {
+        return res.status(404).json({
+          success: false,
+          message: "Người dùng không tồn tại",
+        });
       }
+
+      if (seller.action === "lock") {
+        return res.status(400).json({
+          success: false,
+          message: "Không thể duyệt cửa hàng khi người dùng bị khóa",
+        });
+      }
+
+      if (seller.role === "buyer") {
+        seller.role = "seller";
+        await seller.save();
+      }
+    }
+
+    // --- Determine audit action + description ---
+    let auditAction = AUDIT.STORE_UPDATE;
+    let auditDescription;
+
     if (status === "approved") {
       auditAction = AUDIT.STORE_APPROVE;
       auditDescription = `Approved shop ${store.storeName}`;
     } else if (status === "rejected") {
       auditAction = AUDIT.STORE_REJECT;
       auditDescription = `Rejected shop ${store.storeName}`;
-    } else if (status === "locked") {
-      auditAction = "STORE_LOCK";
-      auditDescription = `Locked shop ${store.storeName}`;
-    } else if (status === "active") {
-      auditAction = "STORE_UNLOCK";
-      auditDescription = `Unlocked shop ${store.storeName}`;
     } else {
       auditDescription = `Updated shop ${store.storeName} status to ${status}`;
     }
 
+    // --- Persist status change ---
     store.status = status;
     await store.save();
 
+    // --- Audit log ---
     await createAuditLog({
       admin: req.user.id,
       action: auditAction,
@@ -565,6 +562,7 @@ exports.updateStoreStatusByAdmin = async (req, res) => {
       newValue: { status: status },
     }, req);
 
+    // --- Email notification to seller on status change ---
     if (status !== previousStatus) {
       const seller = await User.findById(store.sellerId);
 
@@ -575,45 +573,31 @@ exports.updateStoreStatusByAdmin = async (req, res) => {
         switch (status) {
           case "approved":
             emailSubject = "Cửa hàng của bạn đã được duyệt";
-            emailText = `Kính gửi ${seller.username},
-
-Cửa hàng "${store.storeName}" đã được duyệt.
-
-Trân trọng,
-Aba Team`;
+            emailText = `Kính gửi ${seller.username},\n\nCửa hàng "${store.storeName}" đã được duyệt.\n\nTrân trọng,\nAba Team`;
             break;
 
           case "rejected":
             emailSubject = "Cửa hàng của bạn đã bị từ chối";
-            emailText = `Kính gửi ${seller.username},
-
-Cửa hàng "${store.storeName}" đã bị từ chối.
-
-Trân trọng,
-Aba Team`;
+            emailText = `Kính gửi ${seller.username},\n\nCửa hàng "${store.storeName}" đã bị từ chối.\n\nTrân trọng,\nAba Team`;
             break;
 
           case "pending":
             emailSubject = "Cửa hàng đang chờ duyệt";
-            emailText = `Kính gửi ${seller.username},
-
-Cửa hàng "${store.storeName}" đang ở trạng thái chờ duyệt.
-
-Trân trọng,
-Aba Team`;
+            emailText = `Kính gửi ${seller.username},\n\nCửa hàng "${store.storeName}" đang ở trạng thái chờ duyệt.\n\nTrân trọng,\nAba Team`;
             break;
         }
 
-        await sendEmail(seller.email, emailSubject, emailText);
+        if (emailSubject) {
+          await sendEmail(seller.email, emailSubject, emailText);
+        }
       }
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: `Cập nhật trạng thái cửa hàng thành công`,
       data: store,
     });
-  }
   } catch (error) {
     handleError(res, error, "Lỗi khi cập nhật trạng thái cửa hàng");
   }
