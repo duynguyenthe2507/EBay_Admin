@@ -216,7 +216,7 @@ exports.approveUser = async (req, res) => {
       if (approved) {
         // Email thông báo duyệt tài khoản
         emailSubject = "Tài khoản của bạn đã được duyệt";
-        emailText = `Kính gửi ${user.username},\n\nTài khoản của bạn đã được duyệt bởi quản trị viên. Bạn có thể bắt đầu sử dụng dịch vụ của chúng tôi.\n\nTrân trọng,\nShopii Team`;
+        emailText = `Kính gửi ${user.username},\n\nTài khoản của bạn đã được duyệt bởi quản trị viên. Bạn có thể bắt đầu sử dụng dịch vụ của chúng tôi.\n\nTrân trọng,\nAba Team`;
       } else {
         // Email thông báo từ chối tài khoản
         emailSubject = "Tài khoản của bạn chưa được duyệt";
@@ -226,7 +226,7 @@ exports.approveUser = async (req, res) => {
           emailText += `\n\nLý do: ${rejectionReason}`;
         }
 
-        emailText += `\n\nVui lòng liên hệ hỗ trợ để biết thêm chi tiết hoặc yêu cầu xem xét lại.\n\nTrân trọng,\nShopii Team`;
+        emailText += `\n\nVui lòng liên hệ hỗ trợ để biết thêm chi tiết hoặc yêu cầu xem xét lại.\n\nTrân trọng,\nAba Team`;
       }
 
       try {
@@ -580,7 +580,7 @@ exports.updateStoreStatusByAdmin = async (req, res) => {
 Cửa hàng "${store.storeName}" đã được duyệt.
 
 Trân trọng,
-Shopii Team`;
+Aba Team`;
             break;
 
           case "rejected":
@@ -590,7 +590,7 @@ Shopii Team`;
 Cửa hàng "${store.storeName}" đã bị từ chối.
 
 Trân trọng,
-Shopii Team`;
+Aba Team`;
             break;
 
           case "pending":
@@ -600,7 +600,7 @@ Shopii Team`;
 Cửa hàng "${store.storeName}" đang ở trạng thái chờ duyệt.
 
 Trân trọng,
-Shopii Team`;
+Aba Team`;
             break;
         }
 
@@ -1186,7 +1186,7 @@ exports.updateOrderStatusAdmin = async (req, res) => {
       };
 
       const emailSubject = `Cập nhật trạng thái đơn hàng #${orderId}`;
-      const emailText = `Kính gửi ${buyer.username},\n\nĐơn hàng #${orderId} của bạn đã được cập nhật trạng thái thành: ${statusMessages[status] || status}.\n\nTổng giá trị đơn hàng: ${order.totalPrice.toLocaleString("vi-VN")} VNĐ\n\nTrân trọng,\nShopii Team`;
+      const emailText = `Kính gửi ${buyer.username},\n\nĐơn hàng #${orderId} của bạn đã được cập nhật trạng thái thành: ${statusMessages[status] || status}.\n\nTổng giá trị đơn hàng: ${order.totalPrice.toLocaleString("vi-VN")} VNĐ\n\nTrân trọng,\nAba Team`;
 
       try {
         await sendEmail(buyer.email, emailSubject, emailText);

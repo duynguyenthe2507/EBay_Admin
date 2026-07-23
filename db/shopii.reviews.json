@@ -1,62 +1,204 @@
-[{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610c92"
+[
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610c92"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c8d"
+    },
+    "reviewerId": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "rating": 5,
+    "comment": "Excellent product, very satisfied with the purchase!",
+    "parentId": null,
+    "createdAt": {
+      "$date": "2023-07-01T18:20:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2023-07-01T18:20:00.000Z"
+    }
   },
-  "productId": {
-    "$oid": "60d21b4667d0d8992e610c8d"
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610cab"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c8d"
+    },
+    "reviewerId": {
+      "$oid": "60d21b4667d0d8992e610c89"
+    },
+    "comment": "Thank you for your positive feedback!",
+    "parentId": {
+      "$oid": "60d21b4667d0d8992e610c92"
+    },
+    "createdAt": {
+      "$date": "2023-07-02T09:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2023-07-02T09:30:00.000Z"
+    }
   },
-  "reviewerId": {
-    "$oid": "60d21b4667d0d8992e610c88"
+  {
+    "_id": {
+      "$oid": "68805260b2338f453606be29"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c8e"
+    },
+    "reviewerId": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "rating": 5,
+    "comment": "xịn",
+    "parentId": null,
+    "createdAt": {
+      "$date": "2025-07-23T03:09:20.464Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-23T03:09:20.464Z"
+    },
+    "__v": 0
   },
-  "rating": 5,
-  "comment": "Excellent product, very satisfied with the purchase!",
-  "parentId": null,
-  "createdAt": {
-    "$date": "2023-07-01T18:20:00.000Z"
+  {
+    "_id": {
+      "$oid": "688900000000000000000009"
+    },
+    "productId": {
+      "$oid": "688900000000000000000004"
+    },
+    "reviewerId": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "rating": 4,
+    "comment": "Seed review generated for demo seeding",
+    "parentId": null,
+    "createdAt": {
+      "$date": "2026-07-23T08:40:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T08:40:00.000Z"
+    }
   },
-  "updatedAt": {
-    "$date": "2023-07-01T18:20:00.000Z"
+  {
+    "_id": {
+      "$oid": "689000000000000000000110"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c8e"
+    },
+    "reviewerId": {
+      "$oid": "60d21b4667d0d8992e610c8a"
+    },
+    "rating": 3,
+    "comment": "Seed review 1",
+    "parentId": null,
+    "createdAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000111"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c90"
+    },
+    "reviewerId": {
+      "$oid": "690c7fdaaa95f07461f075b7"
+    },
+    "rating": 4,
+    "comment": "Seed review 2",
+    "parentId": null,
+    "createdAt": {
+      "$date": "2026-07-23T17:50:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:50:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000112"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c91"
+    },
+    "reviewerId": {
+      "$oid": "688900000000000000000001"
+    },
+    "rating": 5,
+    "comment": "Seed review 3",
+    "parentId": null,
+    "createdAt": {
+      "$date": "2026-07-23T18:30:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T18:30:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000113"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c92"
+    },
+    "reviewerId": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "rating": 3,
+    "comment": "Seed review 4",
+    "parentId": null,
+    "createdAt": {
+      "$date": "2026-07-23T19:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T19:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000114"
+    },
+    "productId": {
+      "$oid": "688900000000000000000004"
+    },
+    "reviewerId": {
+      "$oid": "60d21b4667d0d8992e610c89"
+    },
+    "rating": 4,
+    "comment": "Seed review 5",
+    "parentId": null,
+    "createdAt": {
+      "$date": "2026-07-23T19:50:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T19:50:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000115"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c8d"
+    },
+    "reviewerId": {
+      "$oid": "60d21b4667d0d8992e610c8a"
+    },
+    "rating": 5,
+    "comment": "Seed review 6",
+    "parentId": null,
+    "createdAt": {
+      "$date": "2026-07-23T20:30:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T20:30:19.028Z"
+    }
   }
-},
-{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610cab"
-  },
-  "productId": {
-    "$oid": "60d21b4667d0d8992e610c8d"
-  },
-  "reviewerId": {
-    "$oid": "60d21b4667d0d8992e610c89"
-  },
-  "comment": "Thank you for your positive feedback!",
-  "parentId": {
-    "$oid": "60d21b4667d0d8992e610c92"
-  },
-  "createdAt": {
-    "$date": "2023-07-02T09:30:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2023-07-02T09:30:00.000Z"
-  }
-},
-{
-  "_id": {
-    "$oid": "68805260b2338f453606be29"
-  },
-  "productId": {
-    "$oid": "60d21b4667d0d8992e610c8e"
-  },
-  "reviewerId": {
-    "$oid": "60d21b4667d0d8992e610c88"
-  },
-  "rating": 5,
-  "comment": "xịn",
-  "parentId": null,
-  "createdAt": {
-    "$date": "2025-07-23T03:09:20.464Z"
-  },
-  "updatedAt": {
-    "$date": "2025-07-23T03:09:20.464Z"
-  },
-  "__v": 0
-}]
+]

@@ -1,44 +1,222 @@
-[{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610c91"
+[
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610c91"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c8e"
+    },
+    "bidAmount": 1350,
+    "bidDate": {
+      "$date": "2023-06-28T16:45:00.000Z"
+    },
+    "isWinningBid": false,
+    "createdAt": {
+      "$date": "2023-06-28T16:45:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2023-06-28T16:45:00.000Z"
+    }
   },
-  "userId": {
-    "$oid": "60d21b4667d0d8992e610c88"
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610caa"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c8e"
+    },
+    "bidAmount": 1400,
+    "bidDate": {
+      "$date": "2023-06-29T10:15:00.000Z"
+    },
+    "isWinningBid": true,
+    "createdAt": {
+      "$date": "2023-06-29T10:15:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2023-06-29T10:15:00.000Z"
+    }
   },
-  "productId": {
-    "$oid": "60d21b4667d0d8992e610c8e"
+  {
+    "_id": {
+      "$oid": "688900000000000000000012"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c8e"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "bidAmount": 1350,
+    "bidDate": {
+      "$date": "2026-07-23T11:30:00.000Z"
+    },
+    "isWinningBid": false,
+    "createdAt": {
+      "$date": "2026-07-23T11:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T11:30:00.000Z"
+    }
   },
-  "bidAmount": 1350,
-  "bidDate": {
-    "$date": "2023-06-28T16:45:00.000Z"
+  {
+    "_id": {
+      "$oid": "068900000000000000000010"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c8e"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c8a"
+    },
+    "bidAmount": 1000,
+    "bidDate": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    },
+    "isWinningBid": false,
+    "createdAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    }
   },
-  "isWinningBid": false,
-  "createdAt": {
-    "$date": "2023-06-28T16:45:00.000Z"
+  {
+    "_id": {
+      "$oid": "068900000000000000000011"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c90"
+    },
+    "userId": {
+      "$oid": "690c7fdaaa95f07461f075b7"
+    },
+    "bidAmount": 1050,
+    "bidDate": {
+      "$date": "2026-07-23T18:10:19.028Z"
+    },
+    "isWinningBid": false,
+    "createdAt": {
+      "$date": "2026-07-23T18:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T18:10:19.028Z"
+    }
   },
-  "updatedAt": {
-    "$date": "2023-06-28T16:45:00.000Z"
+  {
+    "_id": {
+      "$oid": "068900000000000000000012"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c91"
+    },
+    "userId": {
+      "$oid": "688900000000000000000001"
+    },
+    "bidAmount": 1100,
+    "bidDate": {
+      "$date": "2026-07-23T19:10:19.028Z"
+    },
+    "isWinningBid": false,
+    "createdAt": {
+      "$date": "2026-07-23T19:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T19:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000013"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c92"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "bidAmount": 1150,
+    "bidDate": {
+      "$date": "2026-07-23T20:10:19.028Z"
+    },
+    "isWinningBid": false,
+    "createdAt": {
+      "$date": "2026-07-23T20:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T20:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000014"
+    },
+    "productId": {
+      "$oid": "688900000000000000000004"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c89"
+    },
+    "bidAmount": 1200,
+    "bidDate": {
+      "$date": "2026-07-23T21:10:19.028Z"
+    },
+    "isWinningBid": false,
+    "createdAt": {
+      "$date": "2026-07-23T21:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T21:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000015"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c8d"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c8a"
+    },
+    "bidAmount": 1250,
+    "bidDate": {
+      "$date": "2026-07-23T22:10:19.028Z"
+    },
+    "isWinningBid": false,
+    "createdAt": {
+      "$date": "2026-07-23T22:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T22:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000016"
+    },
+    "productId": {
+      "$oid": "60d21b4667d0d8992e610c8e"
+    },
+    "userId": {
+      "$oid": "690c7fdaaa95f07461f075b7"
+    },
+    "bidAmount": 1300,
+    "bidDate": {
+      "$date": "2026-07-23T23:10:19.028Z"
+    },
+    "isWinningBid": false,
+    "createdAt": {
+      "$date": "2026-07-23T23:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T23:10:19.028Z"
+    }
   }
-},
-{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610caa"
-  },
-  "userId": {
-    "$oid": "60d21b4667d0d8992e610c88"
-  },
-  "productId": {
-    "$oid": "60d21b4667d0d8992e610c8e"
-  },
-  "bidAmount": 1400,
-  "bidDate": {
-    "$date": "2023-06-29T10:15:00.000Z"
-  },
-  "isWinningBid": true,
-  "createdAt": {
-    "$date": "2023-06-29T10:15:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2023-06-29T10:15:00.000Z"
-  }
-}]
+]

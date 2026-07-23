@@ -278,7 +278,7 @@ export default function AdminDashboardLayout() {
             }}
           >
             <Typography variant="h6" color="primary.contrastText" sx={{ ml: 1, display: open ? "block" : "none" }}>
-              SHOP SDN
+              Aba Administration
             </Typography>
             <IconButton onClick={toggleDrawer} sx={{ color: "white" }}>
               <ChevronLeftIcon />

@@ -195,7 +195,7 @@ const HeaderBottom = () => {
               <div className="flex items-center">
                 <IoStorefrontOutline className="text-3xl text-white mr-2" />
                 <p className="text-[24px] font-bold text-white tracking-wider hover:text-gray-100 transition-colors">
-                  TUTHAITU
+                  Aba
                 </p>
               </div>
             </Link>

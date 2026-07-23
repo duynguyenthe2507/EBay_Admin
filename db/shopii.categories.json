@@ -1,39 +1,132 @@
-[{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610c85"
+[
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610c85"
+    },
+    "name": "Electronics",
+    "description": "Electronic devices and accessories",
+    "createdAt": {
+      "$date": "2023-06-20T10:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2023-06-20T10:00:00.000Z"
+    }
   },
-  "name": "Electronics",
-  "description": "Electronic devices and accessories",
-  "createdAt": {
-    "$date": "2023-06-20T10:00:00.000Z"
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610c86"
+    },
+    "name": "Clothing",
+    "description": "Fashion items and apparel",
+    "createdAt": {
+      "$date": "2023-06-20T10:05:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2023-06-20T10:05:00.000Z"
+    }
   },
-  "updatedAt": {
-    "$date": "2023-06-20T10:00:00.000Z"
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610c87"
+    },
+    "name": "Home & Kitchen",
+    "description": "Home appliances and kitchen items",
+    "createdAt": {
+      "$date": "2023-06-20T10:10:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2023-06-20T10:10:00.000Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "688900000000000000000003"
+    },
+    "name": "Beauty",
+    "description": "Beauty and personal care products",
+    "createdAt": {
+      "$date": "2026-07-23T09:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T09:00:00.000Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000040"
+    },
+    "name": "Seed Category 1",
+    "description": "Seed category 1 description",
+    "createdAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000041"
+    },
+    "name": "Seed Category 2",
+    "description": "Seed category 2 description",
+    "createdAt": {
+      "$date": "2026-07-23T17:25:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:25:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000042"
+    },
+    "name": "Seed Category 3",
+    "description": "Seed category 3 description",
+    "createdAt": {
+      "$date": "2026-07-23T17:40:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:40:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000043"
+    },
+    "name": "Seed Category 4",
+    "description": "Seed category 4 description",
+    "createdAt": {
+      "$date": "2026-07-23T17:55:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:55:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000044"
+    },
+    "name": "Seed Category 5",
+    "description": "Seed category 5 description",
+    "createdAt": {
+      "$date": "2026-07-23T18:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T18:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000045"
+    },
+    "name": "Seed Category 6",
+    "description": "Seed category 6 description",
+    "createdAt": {
+      "$date": "2026-07-23T18:25:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T18:25:19.028Z"
+    }
   }
-},
-{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610c86"
-  },
-  "name": "Clothing",
-  "description": "Fashion items and apparel",
-  "createdAt": {
-    "$date": "2023-06-20T10:05:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2023-06-20T10:05:00.000Z"
-  }
-},
-{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610c87"
-  },
-  "name": "Home & Kitchen",
-  "description": "Home appliances and kitchen items",
-  "createdAt": {
-    "$date": "2023-06-20T10:10:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2023-06-20T10:10:00.000Z"
-  }
-}]
+]

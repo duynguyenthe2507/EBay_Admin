@@ -6,7 +6,8 @@
     "start": "concurrently \"npm run start --prefix backend\" \"npm run start --prefix frontend\"",
     "start:backend": "npm run start --prefix backend",
     "start:frontend": "npm run start --prefix frontend",
-    "install:all": "npm i && npm i --prefix backend && npm i --prefix frontend"
+    "install:all": "npm i && npm i --prefix backend && npm i --prefix frontend",
+    "seed": "node db/seed.js"
   },
   "devDependencies": {
     "concurrently": "^9.0.1"

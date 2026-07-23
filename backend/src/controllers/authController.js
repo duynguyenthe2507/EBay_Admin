@@ -64,7 +64,7 @@ exports.register = async (req, res) => {
 
     // Gửi email chào mừng
     try {
-      await sendEmail(user.email, "Welcome to Shopii", "Thank you for registering with us!");
+      await sendEmail(user.email, "Welcome to Aba", "Thank you for registering with us!");
     } catch (emailError) {
       logger.error("Failed to send welcome email:", emailError);
     }
@@ -342,7 +342,7 @@ exports.setupAdmin2FA = async (req, res) => {
     if (!user || user.role !== 'admin') {
       return res.status(403).json({ success: false, message: 'Only admin can setup 2FA' });
     }
-    const secret = speakeasy.generateSecret({ name: `Shopii Admin (${user.email})` });
+    const secret = speakeasy.generateSecret({ name: `Aba Admin (${user.email})` });
     user.twoFASecret = secret.base32;
     user.twoFAEnabled = true;
     await user.save();

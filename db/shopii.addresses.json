@@ -1,21 +1,212 @@
-[{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610c8c"
+[
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610c8c"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "fullName": "John Doe",
+    "phone": "1234567890",
+    "street": "123 Main St",
+    "city": "New York",
+    "state": "NY",
+    "country": "USA",
+    "isDefault": true,
+    "createdAt": {
+      "$date": "2023-06-22T15:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2023-06-22T15:00:00.000Z"
+    }
   },
-  "userId": {
-    "$oid": "60d21b4667d0d8992e610c88"
+  {
+    "_id": {
+      "$oid": "688900000000000000000002"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "fullName": "Seed Buyer 01",
+    "phone": "0987654321",
+    "street": "456 Seed Street",
+    "city": "Hanoi",
+    "state": "HN",
+    "country": "Vietnam",
+    "isDefault": false,
+    "createdAt": {
+      "$date": "2026-07-23T08:05:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T08:05:00.000Z"
+    }
   },
-  "fullName": "John Doe",
-  "phone": "1234567890",
-  "street": "123 Main St",
-  "city": "New York",
-  "state": "NY",
-  "country": "USA",
-  "isDefault": true,
-  "createdAt": {
-    "$date": "2023-06-22T15:00:00.000Z"
+  {
+    "_id": {
+      "$oid": "068900000000000000000001"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "fullName": "Seed Address 1",
+    "phone": "0900000001",
+    "street": "1 Seed Street",
+    "city": "Ho Chi Minh",
+    "state": "SG",
+    "country": "Vietnam",
+    "isDefault": false,
+    "createdAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    }
   },
-  "updatedAt": {
-    "$date": "2023-06-22T15:00:00.000Z"
+  {
+    "_id": {
+      "$oid": "068900000000000000000002"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c89"
+    },
+    "fullName": "Seed Address 2",
+    "phone": "0900000002",
+    "street": "2 Seed Street",
+    "city": "Ho Chi Minh",
+    "state": "SG",
+    "country": "Vietnam",
+    "isDefault": false,
+    "createdAt": {
+      "$date": "2026-07-23T17:11:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:11:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000003"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c8a"
+    },
+    "fullName": "Seed Address 3",
+    "phone": "0900000003",
+    "street": "3 Seed Street",
+    "city": "Ho Chi Minh",
+    "state": "SG",
+    "country": "Vietnam",
+    "isDefault": false,
+    "createdAt": {
+      "$date": "2026-07-23T17:12:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:12:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000004"
+    },
+    "userId": {
+      "$oid": "690c7fdaaa95f07461f075b7"
+    },
+    "fullName": "Seed Address 4",
+    "phone": "0900000004",
+    "street": "4 Seed Street",
+    "city": "Ho Chi Minh",
+    "state": "SG",
+    "country": "Vietnam",
+    "isDefault": false,
+    "createdAt": {
+      "$date": "2026-07-23T17:13:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:13:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000005"
+    },
+    "userId": {
+      "$oid": "688900000000000000000001"
+    },
+    "fullName": "Seed Address 5",
+    "phone": "0900000005",
+    "street": "5 Seed Street",
+    "city": "Ho Chi Minh",
+    "state": "SG",
+    "country": "Vietnam",
+    "isDefault": false,
+    "createdAt": {
+      "$date": "2026-07-23T17:14:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:14:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000006"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "fullName": "Seed Address 6",
+    "phone": "0900000006",
+    "street": "6 Seed Street",
+    "city": "Ho Chi Minh",
+    "state": "SG",
+    "country": "Vietnam",
+    "isDefault": false,
+    "createdAt": {
+      "$date": "2026-07-23T17:15:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:15:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000007"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c89"
+    },
+    "fullName": "Seed Address 7",
+    "phone": "0900000007",
+    "street": "7 Seed Street",
+    "city": "Ho Chi Minh",
+    "state": "SG",
+    "country": "Vietnam",
+    "isDefault": false,
+    "createdAt": {
+      "$date": "2026-07-23T17:16:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:16:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000008"
+    },
+    "userId": {
+      "$oid": "60d21b4667d0d8992e610c8a"
+    },
+    "fullName": "Seed Address 8",
+    "phone": "0900000008",
+    "street": "8 Seed Street",
+    "city": "Ho Chi Minh",
+    "state": "SG",
+    "country": "Vietnam",
+    "isDefault": false,
+    "createdAt": {
+      "$date": "2026-07-23T17:17:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:17:19.028Z"
+    }
   }
-}]
+]

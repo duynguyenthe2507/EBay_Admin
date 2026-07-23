@@ -37,24 +37,6 @@
   },
   {
     "_id": {
-      "$oid": "60d21b4667d0d8992e610c8a"
-    },
-    "username": "admin",
-    "fullname": "Admin User",
-    "email": "winfourt4@gmail.com",
-    "password": "$2b$10$04H3KSPmEpRVaKn8DANpleVj9/lwCs3gTuu5EeJTU0iEb.hK9Qbom",
-    "role": "admin",
-    "avatarURL": "https://example.com/avatars/admin.jpg",
-    "action": "unlock",
-    "createdAt": {
-      "$date": "2023-06-21T09:00:00.000Z"
-    },
-    "updatedAt": {
-      "$date": "2025-07-24T06:26:46.325Z"
-    }
-  },
-  {
-    "_id": {
       "$oid": "690c7fdaaa95f07461f075b7"
     },
     "username": "dat10bn@gmail.com",
@@ -104,6 +86,126 @@
     },
     "updatedAt": {
       "$date": "2026-07-21T11:38:58.002Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "688900000000000000000001"
+    },
+    "username": "buyer",
+    "fullname": "buyer",
+    "email": "buyer@example.com",
+    "password": "$2b$10$65Ex5GqnRiem2XBERex2AuI8hh5TUrIXADpWmMzZgjEdaE1QRSIzG",
+    "role": "buyer",
+    "avatarURL": "https://example.com/avatars/seedbuyer01.jpg",
+    "action": "unlock",
+    "accountStatus": "approved",
+    "createdAt": {
+      "$date": "2026-07-23T08:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T08:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000130"
+    },
+    "username": "seller",
+    "fullname": "Seller User",
+    "email": "seller@example.com",
+    "password": "$2b$10$65Ex5GqnRiem2XBERex2AuI8hh5TUrIXADpWmMzZgjEdaE1QRSIzG",
+    "role": "seller",
+    "avatarURL": "https://example.com/avatars/seed1.jpg",
+    "action": "unlock",
+    "accountStatus": "approved",
+    "createdAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000131"
+    },
+    "username": "finance",
+    "fullname": "finance",
+    "email": "finance@example.com",
+    "password": "$2b$10$65Ex5GqnRiem2XBERex2AuI8hh5TUrIXADpWmMzZgjEdaE1QRSIzG",
+    "role": "finance",
+    "avatarURL": "https://example.com/avatars/seed2.jpg",
+    "action": "unlock",
+    "accountStatus": "approved",
+    "createdAt": {
+      "$date": "2026-07-23T17:40:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:40:19.028Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000132"
+    },
+    "username": "monitor",
+    "fullname": "monitor",
+    "email": "monitor@example.com",
+    "password": "$2b$10$65Ex5GqnRiem2XBERex2AuI8hh5TUrIXADpWmMzZgjEdaE1QRSIzG",
+    "role": "monitor",
+    "avatarURL": "https://example.com/avatars/seed3.jpg",
+    "action": "unlock",
+    "accountStatus": "approved",
+    "createdAt": {
+      "$date": "2026-07-23T18:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T18:10:19.028Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000133"
+    },
+    "username": "support",
+    "fullname": "support",
+    "email": "support@example.com",
+    "password": "$2b$10$65Ex5GqnRiem2XBERex2AuI8hh5TUrIXADpWmMzZgjEdaE1QRSIzG",
+    "role": "support",
+    "avatarURL": "https://example.com/avatars/seed4.jpg",
+    "action": "unlock",
+    "accountStatus": "approved",
+    "createdAt": {
+      "$date": "2026-07-23T18:40:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T18:40:19.028Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000134"
+    },
+    "username": "admin",
+    "fullname": "admin",
+    "email": "admin@example.com",
+    "password": "$2b$10$65Ex5GqnRiem2XBERex2AuI8hh5TUrIXADpWmMzZgjEdaE1QRSIzG",
+    "role": "admin",
+    "avatarURL": "https://example.com/avatars/seed5.jpg",
+    "action": "unlock",
+    "accountStatus": "approved",
+    "createdAt": {
+      "$date": "2026-07-23T21:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T21:10:19.028Z"
     },
     "__v": 0
   }
