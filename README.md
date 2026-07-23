@@ -9,7 +9,7 @@
     ```
 
     ```bash
-    node db/seed.js
+    npm run seed
     ```
     
     ```bash
