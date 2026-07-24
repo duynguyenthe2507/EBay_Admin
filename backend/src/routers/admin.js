@@ -12,6 +12,7 @@ const monitorGuard = require("../middleware/monitorGuard");
 
 // Import các controller functions từ adminController
 const {
+  switchRole,
   // User Management
   getAllUsers,
   getUserDetails,
@@ -262,5 +263,8 @@ router.put(
 
 // Manage AuditLog Routes
 router.get("/audit-logs", authorize(PERMISSIONS.VIEW_REPORTS), getAuditLogs);
+
+// Switch role route
+router.put('/switch-role', switchRole);
 
 module.exports = router;

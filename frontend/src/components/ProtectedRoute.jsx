@@ -32,6 +32,8 @@ const ProtectedRoute = ({ allowedRoles = [], children }) => {
   
   const adminRoles = ['admin', 'monitor', 'support', 'finance'];
   if (user && adminRoles.includes(user.role)) {
+    if (user.role === 'support') return <Navigate to="/admin/manage-users" replace />;
+    if (user.role === 'finance') return <Navigate to="/admin/manage-vouchers" replace />;
     return <Navigate to="/admin" replace />;
   }
   

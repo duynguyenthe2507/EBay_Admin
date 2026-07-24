@@ -19,25 +19,22 @@ const auditLogSchema = new mongoose.Schema(
     adminName: {
       type: String,
     },
-
     action: {
       type: String,
       required: true,
+      index: true,
     },
-
     targetType: {
       type: String,
       required: true,
+      index: true,
     },
-
     targetId: {
       type: mongoose.Schema.Types.Mixed,
     },
-
     description: {
       type: String,
     },
-
     status: {
       type: String,
       enum: ["SUCCESS", "FAILED"],
@@ -88,5 +85,7 @@ const auditLogSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+auditLogSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model("AuditLog", auditLogSchema);

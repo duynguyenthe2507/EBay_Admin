@@ -5,6 +5,9 @@
  */
 module.exports = function monitorGuard(req, res, next) {
   if (req.user?.role === 'monitor') {
+    if (req.originalUrl && req.originalUrl.endsWith('/switch-role')) {
+      return next();
+    }
     const mutatingMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
     if (mutatingMethods.includes(req.method)) {
       return res.status(403).json({

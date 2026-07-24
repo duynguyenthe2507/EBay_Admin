@@ -93,17 +93,6 @@ class AuthenService {
     }
     async logout() {
         try {
-            const token = localStorage.getItem('token');
-            // Try to notify the backend about logout
-            try {
-                await api.post('user/logout', {}, {
-                    headers: { Authorization: `Bearer ${token}` },
-                    withCredentials: true,
-                });
-            } catch (e) {
-                console.log('Error during server logout, continuing with local logout', e);
-            }
-            
             // Clear all auth-related data from localStorage
             localStorage.removeItem('token');
             localStorage.removeItem('accessToken');

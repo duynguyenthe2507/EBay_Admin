@@ -1,6 +1,6 @@
+const { createAuditLog, generateChanges } = require("../services/auditLogService");
+const AUDIT = require("../constants/auditActions");
 const Voucher = require('../models/Voucher');
-const { createAuditLog } = require('../services/auditLogService');
-const AUDIT = require('../constants/auditActions');
 
 // @desc    Create a new voucher
 // @route   POST /api/vouchers
@@ -74,13 +74,14 @@ const updateVoucher = async (req, res, next) => {
     const voucher = await Voucher.findById(req.params.id);
 
     if (voucher) {
+      const before = voucher.toObject();
       voucher.code = code || voucher.code;
       voucher.discount = discount || voucher.discount;
       voucher.expirationDate = expirationDate || voucher.expirationDate;
       voucher.minOrderValue = minOrderValue || voucher.minOrderValue;
       voucher.usageLimit = usageLimit || voucher.usageLimit;
       voucher.maxDiscount = maxDiscount || voucher.maxDiscount;
-      voucher.isActive = isActive !== undefined ? isActive : voucher.isActive;
+      if (isActive !== undefined) voucher.isActive = isActive;
 
       const updatedVoucher = await voucher.save();
 
@@ -110,6 +111,7 @@ const deleteVoucher = async (req, res, next) => {
     const voucher = await Voucher.findById(req.params.id);
 
     if (voucher) {
+      const before = voucher.toObject();
       await voucher.remove();
 
       await createAuditLog({
@@ -138,8 +140,24 @@ const toggleVoucherActive = async (req, res, next) => {
     const voucher = await Voucher.findById(req.params.id);
 
     if (voucher) {
+      const before = voucher.toObject();
       voucher.isActive = !voucher.isActive;
       const updatedVoucher = await voucher.save();
+      const after = updatedVoucher.toObject();
+      
+      await createAuditLog({
+        admin: req.user?._id || req.user?.id,
+        action: AUDIT.COUPON_UPDATE || "COUPON_UPDATE",
+        targetType: "Voucher",
+        targetId: voucher._id,
+        before,
+        after,
+        description: `Toggled voucher "${voucher.code}" active status\\nOld: ${before.isActive}\\nNew: ${after.isActive}`,
+        status: "SUCCESS",
+        ip: req.ip,
+        userAgent: req.headers["user-agent"],
+      });
+
       res.json(updatedVoucher);
     } else {
       res.status(404).json({ message: 'Voucher not found' });
@@ -184,7 +202,6 @@ const getVoucherByCode = async (req, res, next) => {
   }
 };
 
-
 module.exports = {
   createVoucher,
   getVouchers,
@@ -192,6 +209,5 @@ module.exports = {
   updateVoucher,
   deleteVoucher,
   toggleVoucherActive,
-  getVoucherByCode, // Thêm hàm mới vào đây
-
+  getVoucherByCode,
 };

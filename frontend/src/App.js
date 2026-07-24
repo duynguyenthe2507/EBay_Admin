@@ -124,58 +124,58 @@ const router = createBrowserRouter(
           <AdminDashboardLayout />
         </ProtectedRoute>
       }>
-        {/* Overview - All admin-level can view */}
+        {/* Overview - Admin only */}
         <Route path="/admin" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MONITOR, ROLES.SUPPORT, ROLES.FINANCE]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MONITOR]}>
             <OverviewA />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Products - Admin & Monitor */}
+        {/* Manage Products - Admin */}
         <Route path="/admin/manage-products" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MONITOR]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
             <ManageProductA />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Users - Admin, Support & Monitor */}
+        {/* Manage Users - Admin & Support */}
         <Route path="/admin/manage-users" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT, ROLES.MONITOR]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT]}>
             <ManageUser />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Stores - Admin, Support & Monitor */}
+        {/* Manage Stores - Admin & Support */}
         <Route path="/admin/manage-stores" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT, ROLES.MONITOR]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT]}>
             <ManageStore />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Vouchers - Admin, Finance & Monitor */}
+        {/* Manage Vouchers - Admin & Finance */}
         <Route path="/admin/manage-vouchers" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.FINANCE, ROLES.MONITOR]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.FINANCE]}>
             <ManageVoucher />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Orders - Admin, Finance & Monitor */}
+        {/* Manage Orders - Admin & Finance */}
         <Route path="/admin/manage-orders" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.FINANCE, ROLES.MONITOR]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.FINANCE]}>
             <ManageOrderAdmin />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Reviews - Admin, Support & Monitor */}
+        {/* Manage Reviews - Admin & Support */}
         <Route path="/admin/manage-reviews" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT, ROLES.MONITOR]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT]}>
             <ManageReviews />
           </ProtectedRoute>
         }></Route>
 
-        {/* Manage Disputes - Admin, Support & Monitor */}
+        {/* Manage Disputes - Admin & Support */}
         <Route path="/admin/manage-disputes" element={
-          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT, ROLES.MONITOR]}>
+          <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPPORT]}>
             <ManageDisputes />
           </ProtectedRoute>
         }></Route>

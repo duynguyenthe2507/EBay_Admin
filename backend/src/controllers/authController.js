@@ -1,9 +1,10 @@
+const { createAuditLog } = require("../services/auditLogService");
+const AUDIT = require("../constants/auditActions");
 const { User } = require("../models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const logger = require("../utils/logger");
 const { sendEmail } = require("../services/emailService");
-const { createAuditLog } = require("../services/auditLogService");
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
 

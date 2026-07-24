@@ -1,5 +1,7 @@
 import * as React from "react";
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { jwtDecode } from "jwt-decode";
+import { setCredentials } from "../../features/auth/authSlice";
 import CssBaseline from "@mui/material/CssBaseline";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
@@ -8,7 +10,7 @@ import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-import { Chip, Avatar, Paper, Tooltip } from "@mui/material";
+import { Chip, Avatar, Paper, Tooltip, Menu, MenuItem } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Container from "@mui/material/Container";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -140,6 +142,55 @@ export default function AdminDashboardLayout() {
   };
   const [adminInfo, setAdminInfo] = useState(null);
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const openMenu = Boolean(anchorEl);
+  const handleMenuClick = (event) => setAnchorEl(event.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
+
+  const handleSwitchRole = async (newRole) => {
+    handleMenuClose();
+    if (newRole === adminInfo?.role) return;
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await axios.put("http://localhost:9999/api/admin/switch-role", { role: newRole }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data.success) {
+        const newToken = res.data.token;
+        const decoded = jwtDecode(newToken);
+        
+        // Update Redux state directly (this also saves to redux-persist localStorage)
+        dispatch(setCredentials({
+          user: {
+            id: decoded.id,
+            username: decoded.username || decoded.userName || auth?.user?.username,
+            role: decoded.role,
+          },
+          token: newToken
+        }));
+
+        // Navigate to the correct default screen for that role without a full reload
+        if (newRole === 'support') {
+          navigate('/admin/manage-users');
+        } else if (newRole === 'finance') {
+          navigate('/admin/manage-vouchers');
+        } else {
+          navigate('/admin');
+        }
+
+        // Update local state so the Avatar Chip instantly reflects the new role
+        setAdminInfo(prev => ({
+          ...prev,
+          role: newRole
+        }));
+      }
+    } catch (err) {
+      console.error("Lỗi khi đổi role:", err);
+      alert("Đổi role thất bại!");
+    }
+  };
+
+
   // Get current path to highlight active menu item
   const currentPath = location.pathname;
 
@@ -197,7 +248,6 @@ export default function AdminDashboardLayout() {
   // Monitor can view ALL tabs but cannot mutate data
   const canAccess = (requiredRoles) => {
     if (!userRole) return false;
-    if (userRole === 'monitor') return true; // monitor sees everything
     return requiredRoles.includes(userRole);
   };
 
@@ -249,20 +299,36 @@ export default function AdminDashboardLayout() {
             </Typography>
 
             {adminInfo && (
-              <Tooltip title={adminInfo.fullname} arrow>
-                <Chip
-                  avatar={<Avatar src={adminInfo.avatarURL} alt={adminInfo.fullname} />}
-                  label={adminInfo.username}
-                  color="default"
-                  sx={{
-                    ml: 1,
-                    fontWeight: 600,
-                    fontSize: 16,
-                    backgroundColor: "rgba(255,255,255,0.15)",
-                    color: "white",
-                  }}
-                />
-              </Tooltip>
+              <>
+                <Tooltip title="Nhấn để đổi Role" arrow>
+                  <Chip
+                    onClick={handleMenuClick}
+                    avatar={<Avatar src={adminInfo.avatarURL} alt={adminInfo.fullname} />}
+                    label={adminInfo.username + " (" + adminInfo.role + ")"}
+                    color="default"
+                    sx={{
+                      ml: 1,
+                      fontWeight: 600,
+                      fontSize: 16,
+                      backgroundColor: "rgba(255,255,255,0.15)",
+                      color: "white",
+                      cursor: 'pointer'
+                    }}
+                  />
+                </Tooltip>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={openMenu}
+                  onClose={handleMenuClose}
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                  transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                >
+                  <MenuItem onClick={() => handleSwitchRole('admin')} selected={adminInfo.role === 'admin'}>Admin</MenuItem>
+                  <MenuItem onClick={() => handleSwitchRole('monitor')} selected={adminInfo.role === 'monitor'}>Monitor</MenuItem>
+                  <MenuItem onClick={() => handleSwitchRole('finance')} selected={adminInfo.role === 'finance'}>Finance</MenuItem>
+                  <MenuItem onClick={() => handleSwitchRole('support')} selected={adminInfo.role === 'support'}>Support</MenuItem>
+                </Menu>
+              </>
             )}
           </Toolbar>
         </AppBar>
@@ -288,16 +354,18 @@ export default function AdminDashboardLayout() {
 
           <List component="nav">
             <React.Fragment>
-              {/* Dashboard Overview - All roles */}
-              <ListItemButton
-                onClick={handleOnclickOverview}
-                selected={currentPath === "/admin"}
-              >
-                <ListItemIcon sx={{ color: "primary.contrastText" }}>
-                  <DashboardIcon />
-                </ListItemIcon>
-                <ListItemText primary="Dashboard Overview" primaryTypographyProps={{ fontWeight: currentPath === "/admin" ? 'bold' : 'normal' }} />
-              </ListItemButton>
+              {/* Dashboard Overview - Admin & Monitor */}
+              {canAccess(['admin', 'monitor']) && (
+                <ListItemButton
+                  onClick={handleOnclickOverview}
+                  selected={currentPath === "/admin"}
+                >
+                  <ListItemIcon sx={{ color: "primary.contrastText" }}>
+                    <DashboardIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Dashboard Overview" primaryTypographyProps={{ fontWeight: currentPath === "/admin" ? 'bold' : 'normal' }} />
+                </ListItemButton>
+              )}
 
               {/* User Management - Admin & Support only */}
               {canAccess(['admin', 'support']) && (

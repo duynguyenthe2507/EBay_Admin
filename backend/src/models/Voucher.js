@@ -25,8 +25,6 @@ voucherSchema.pre("save", function (next) {
   const now = new Date();
   if (this.expirationDate < now || this.usedCount >= this.usageLimit) {
     this.isActive = false;
-  } else {
-    this.isActive = true;
   }
   next();
 });
