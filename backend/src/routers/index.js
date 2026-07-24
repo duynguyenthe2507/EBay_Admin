@@ -9,7 +9,7 @@ const categoryController = require('../controllers/categoryController');
 const buyerRouter = require("./buyerRouter");
 const chatRouter = require("./chatRouter");
 const userController = require("../controllers/userController");
-const imageRoutes = require("../routes/imageRoutes");
+const imageRoutes = require("./imageRoutes");
 const { authMiddleware } = require("../middleware/auth.middleware");
 const { authLimiter, sensitiveActionLimiter } = require('../middleware/rateLimiter');
 

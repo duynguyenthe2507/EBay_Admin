@@ -1,8 +1,6 @@
 const { createAuditLog, generateChanges } = require("../services/auditLogService");
 const AUDIT = require("../constants/auditActions");
 const Voucher = require('../models/Voucher');
-const { createAuditLog } = require('../services/auditLogService');
-const AUDIT = require('../constants/auditActions');
 
 // @desc    Create a new voucher
 // @route   POST /api/vouchers

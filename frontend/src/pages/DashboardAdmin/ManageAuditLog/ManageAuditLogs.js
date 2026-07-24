@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -32,7 +32,6 @@ import ClearAllIcon from "@mui/icons-material/ClearAll";
 
 import { getAuditLogs } from "./AdminAuditLogService";
 import AuditLogDetailDialog from "./AuditLogDetailDialog";
-
 export default function ManageAuditLogs() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
