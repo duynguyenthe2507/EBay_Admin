@@ -1,44 +1,222 @@
-[{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610cb4"
+[
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610cb4"
+    },
+    "code": "WELCOME20",
+    "discount": 20,
+    "discountType": "percentage",
+    "maxDiscount": 100,
+    "expirationDate": {
+      "$date": "2023-12-31T23:59:59.000Z"
+    },
+    "minOrderValue": 200,
+    "usageLimit": 1,
+    "usedCount": 0,
+    "isActive": true,
+    "createdAt": {
+      "$date": "2023-06-25T14:30:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2023-06-25T14:30:00.000Z"
+    }
   },
-  "code": "WELCOME20",
-  "discount": 20,
-  "discountType": "percentage",
-  "maxDiscount": 100,
-  "expirationDate": {
-    "$date": "2023-12-31T23:59:59.000Z"
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610cb5"
+    },
+    "code": "FLAT50",
+    "discount": 50,
+    "discountType": "fixed",
+    "maxDiscount": 0,
+    "expirationDate": {
+      "$date": "2023-08-15T23:59:59.000Z"
+    },
+    "minOrderValue": 500,
+    "usageLimit": 100,
+    "usedCount": 12,
+    "isActive": true,
+    "createdAt": {
+      "$date": "2023-06-25T14:45:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2023-07-01T09:20:00.000Z"
+    }
   },
-  "minOrderValue": 200,
-  "usageLimit": 1,
-  "usedCount": 0,
-  "isActive": true,
-  "createdAt": {
-    "$date": "2023-06-25T14:30:00.000Z"
+  {
+    "_id": {
+      "$oid": "688900000000000000000011"
+    },
+    "code": "SEEDDEMO30",
+    "discount": 30,
+    "discountType": "percentage",
+    "maxDiscount": 120,
+    "expirationDate": {
+      "$date": "2026-08-31T23:59:59.000Z"
+    },
+    "minOrderValue": 150,
+    "usageLimit": 10,
+    "usedCount": 0,
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-07-23T08:50:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T08:50:00.000Z"
+    }
   },
-  "updatedAt": {
-    "$date": "2023-06-25T14:30:00.000Z"
+  {
+    "_id": {
+      "$oid": "689000000000000000000140"
+    },
+    "code": "SEEDV1",
+    "discount": 10,
+    "discountType": "percentage",
+    "maxDiscount": 100,
+    "expirationDate": {
+      "$date": "2026-08-06T17:10:19.028Z"
+    },
+    "minOrderValue": 50,
+    "usageLimit": 10,
+    "usedCount": 0,
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000141"
+    },
+    "code": "SEEDV2",
+    "discount": 11,
+    "discountType": "fixed",
+    "maxDiscount": 100,
+    "expirationDate": {
+      "$date": "2026-08-07T17:10:19.028Z"
+    },
+    "minOrderValue": 60,
+    "usageLimit": 11,
+    "usedCount": 0,
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-07-23T17:40:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:40:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000142"
+    },
+    "code": "SEEDV3",
+    "discount": 12,
+    "discountType": "percentage",
+    "maxDiscount": 100,
+    "expirationDate": {
+      "$date": "2026-08-08T17:10:19.028Z"
+    },
+    "minOrderValue": 70,
+    "usageLimit": 12,
+    "usedCount": 0,
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-07-23T18:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T18:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000143"
+    },
+    "code": "SEEDV4",
+    "discount": 13,
+    "discountType": "fixed",
+    "maxDiscount": 100,
+    "expirationDate": {
+      "$date": "2026-08-09T17:10:19.028Z"
+    },
+    "minOrderValue": 80,
+    "usageLimit": 13,
+    "usedCount": 0,
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-07-23T18:40:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T18:40:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000144"
+    },
+    "code": "SEEDV5",
+    "discount": 14,
+    "discountType": "percentage",
+    "maxDiscount": 100,
+    "expirationDate": {
+      "$date": "2026-08-10T17:10:19.028Z"
+    },
+    "minOrderValue": 90,
+    "usageLimit": 14,
+    "usedCount": 0,
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-07-23T19:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T19:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000145"
+    },
+    "code": "SEEDV6",
+    "discount": 15,
+    "discountType": "fixed",
+    "maxDiscount": 100,
+    "expirationDate": {
+      "$date": "2026-08-11T17:10:19.028Z"
+    },
+    "minOrderValue": 100,
+    "usageLimit": 15,
+    "usedCount": 0,
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-07-23T19:40:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T19:40:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000146"
+    },
+    "code": "SEEDV7",
+    "discount": 16,
+    "discountType": "percentage",
+    "maxDiscount": 100,
+    "expirationDate": {
+      "$date": "2026-08-12T17:10:19.028Z"
+    },
+    "minOrderValue": 110,
+    "usageLimit": 16,
+    "usedCount": 0,
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-07-23T20:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T20:10:19.028Z"
+    }
   }
-},
-{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610cb5"
-  },
-  "code": "FLAT50",
-  "discount": 50,
-  "discountType": "fixed",
-  "maxDiscount": 0,
-  "expirationDate": {
-    "$date": "2023-08-15T23:59:59.000Z"
-  },
-  "minOrderValue": 500,
-  "usageLimit": 100,
-  "usedCount": 12,
-  "isActive": true,
-  "createdAt": {
-    "$date": "2023-06-25T14:45:00.000Z"
-  },
-  "updatedAt": {
-    "$date": "2023-07-01T09:20:00.000Z"
-  }
-}]
+]

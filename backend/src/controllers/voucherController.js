@@ -1,6 +1,8 @@
 const { createAuditLog, generateChanges } = require("../services/auditLogService");
 const AUDIT = require("../constants/auditActions");
 const Voucher = require('../models/Voucher');
+const { createAuditLog } = require('../services/auditLogService');
+const AUDIT = require('../constants/auditActions');
 
 // @desc    Create a new voucher
 // @route   POST /api/vouchers
@@ -19,20 +21,16 @@ const createVoucher = async (req, res, next) => {
     });
 
     const createdVoucher = await voucher.save();
-    
+
     await createAuditLog({
-      admin: req.user?._id || req.user?.id,
-      action: AUDIT.COUPON_CREATE || "COUPON_CREATE",
+      admin: req.user?.id,
+      action: "COUPON_CREATE",
       targetType: "Voucher",
       targetId: createdVoucher._id,
-      before: null,
-      after: createdVoucher.toObject(),
-      description: `Created voucher "${code}"`,
-      status: "SUCCESS",
-      ip: req.ip,
-      userAgent: req.headers["user-agent"],
-    });
-    
+      description: `Created voucher ${createdVoucher.code}`,
+      newValue: createdVoucher,
+    }, req);
+
     res.status(201).json(createdVoucher);
   } catch (error) {
     next(error);
@@ -88,25 +86,15 @@ const updateVoucher = async (req, res, next) => {
       if (isActive !== undefined) voucher.isActive = isActive;
 
       const updatedVoucher = await voucher.save();
-      const after = updatedVoucher.toObject();
-      
-      const changesList = generateChanges(before, after);
-      const descriptionText = changesList.length > 0 
-          ? changesList.map(c => `${c.field}: ${c.oldValue} -> ${c.newValue}`).join('\\n')
-          : `Updated voucher "${voucher.code}"`;
 
       await createAuditLog({
-        admin: req.user?._id || req.user?.id,
-        action: AUDIT.COUPON_UPDATE || "COUPON_UPDATE",
+        admin: req.user?.id,
+        action: "COUPON_UPDATE",
         targetType: "Voucher",
-        targetId: voucher._id,
-        before,
-        after,
-        description: descriptionText,
-        status: "SUCCESS",
-        ip: req.ip,
-        userAgent: req.headers["user-agent"],
-      });
+        targetId: updatedVoucher._id,
+        description: `Updated voucher ${updatedVoucher.code}`,
+        newValue: updatedVoucher,
+      }, req);
 
       res.json(updatedVoucher);
     } else {
@@ -127,19 +115,15 @@ const deleteVoucher = async (req, res, next) => {
     if (voucher) {
       const before = voucher.toObject();
       await voucher.remove();
-      
+
       await createAuditLog({
-        admin: req.user?._id || req.user?.id,
-        action: AUDIT.COUPON_DELETE || "COUPON_DELETE",
+        admin: req.user?.id,
+        action: "COUPON_DELETE",
         targetType: "Voucher",
         targetId: voucher._id,
-        before,
-        after: null,
-        description: `Deleted voucher "${voucher.code}"`,
-        status: "SUCCESS",
-        ip: req.ip,
-        userAgent: req.headers["user-agent"],
-      });
+        description: `Deleted voucher ${voucher.code}`,
+        oldValue: voucher,
+      }, req);
 
       res.json({ message: 'Voucher removed' });
     } else {

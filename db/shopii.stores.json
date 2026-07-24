@@ -1,18 +1,182 @@
-[{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610c8b"
+[
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610c8b"
+    },
+    "sellerId": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "storeName": "Jane's Electronics",
+    "description": "Quality electronic products at affordable prices",
+    "bannerImageURL": "https://eastatlanticnetwork.com/wp-content/uploads/2023/08/Sales-and-installations-of-electronics-600x434.jpg",
+    "status": "pending",
+    "createdAt": {
+      "$date": "2023-06-22T10:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-16T05:02:04.932Z"
+    }
   },
-  "sellerId": {
-    "$oid": "60d21b4667d0d8992e610c89"
+  {
+    "_id": {
+      "$oid": "688900000000000000000010"
+    },
+    "sellerId": {
+      "$oid": "60d21b4667d0d8992e610c89"
+    },
+    "storeName": "Seed Demo Store",
+    "description": "Additional demo store created for seeding validation",
+    "bannerImageURL": "https://example.com/banners/seed-demo-store.jpg",
+    "status": "pending",
+    "createdAt": {
+      "$date": "2026-07-23T08:45:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T08:45:00.000Z"
+    }
   },
-  "storeName": "Jane's Electronics",
-  "description": "Quality electronic products at affordable prices",
-  "bannerImageURL": "https://eastatlanticnetwork.com/wp-content/uploads/2023/08/Sales-and-installations-of-electronics-600x434.jpg",
-  "status": "approved",
-  "createdAt": {
-    "$date": "2023-06-22T10:00:00.000Z"
+  {
+    "_id": {
+      "$oid": "689000000000000000000120"
+    },
+    "sellerId": {
+      "$oid": "60d21b4667d0d8992e610c8a"
+    },
+    "storeName": "Seed Store 1",
+    "description": "Seed storefront 1",
+    "bannerImageURL": "https://example.com/stores/seed-1.jpg",
+    "status": "pending",
+    "createdAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    }
   },
-  "updatedAt": {
-    "$date": "2025-07-16T05:02:04.932Z"
+  {
+    "_id": {
+      "$oid": "689000000000000000000121"
+    },
+    "sellerId": {
+      "$oid": "690c7fdaaa95f07461f075b7"
+    },
+    "storeName": "Seed Store 2",
+    "description": "Seed storefront 2",
+    "bannerImageURL": "https://example.com/stores/seed-2.jpg",
+    "status": "pending",
+    "createdAt": {
+      "$date": "2026-07-23T17:40:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:40:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000122"
+    },
+    "sellerId": {
+      "$oid": "688900000000000000000001"
+    },
+    "storeName": "Seed Store 3",
+    "description": "Seed storefront 3",
+    "bannerImageURL": "https://example.com/stores/seed-3.jpg",
+    "status": "pending",
+    "createdAt": {
+      "$date": "2026-07-23T18:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T18:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000123"
+    },
+    "sellerId": {
+      "$oid": "689000000000000000000130"
+    },
+    "storeName": "Seed Store 4",
+    "description": "Seed storefront 4",
+    "bannerImageURL": "https://example.com/stores/seed-4.jpg",
+    "status": "approved",
+    "createdAt": {
+      "$date": "2026-07-23T18:40:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T18:40:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000124"
+    },
+    "sellerId": {
+      "$oid": "689000000000000000000131"
+    },
+    "storeName": "Seed Store 5",
+    "description": "Seed storefront 5",
+    "bannerImageURL": "https://example.com/stores/seed-5.jpg",
+    "status": "approved",
+    "createdAt": {
+      "$date": "2026-07-23T19:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T19:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000125"
+    },
+    "sellerId": {
+      "$oid": "689000000000000000000132"
+    },
+    "storeName": "Seed Store 6",
+    "description": "Seed storefront 6",
+    "bannerImageURL": "https://example.com/stores/seed-6.jpg",
+    "status": "approved",
+    "createdAt": {
+      "$date": "2026-07-23T19:40:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T19:40:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000126"
+    },
+    "sellerId": {
+      "$oid": "689000000000000000000133"
+    },
+    "storeName": "Seed Store 7",
+    "description": "Seed storefront 7",
+    "bannerImageURL": "https://example.com/stores/seed-7.jpg",
+    "status": "approved",
+    "createdAt": {
+      "$date": "2026-07-23T20:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T20:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689000000000000000000127"
+    },
+    "sellerId": {
+      "$oid": "689000000000000000000134"
+    },
+    "storeName": "Seed Store 8",
+    "description": "Seed storefront 8",
+    "bannerImageURL": "https://example.com/stores/seed-8.jpg",
+    "status": "approved",
+    "createdAt": {
+      "$date": "2026-07-23T20:40:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T20:40:19.028Z"
+    }
   }
-}]
+]

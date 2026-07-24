@@ -1,61 +1,203 @@
-[{
-  "_id": {
-    "$oid": "60d21b4667d0d8992e610caf"
+[
+  {
+    "_id": {
+      "$oid": "60d21b4667d0d8992e610caf"
+    },
+    "orderItemId": {
+      "$oid": "60d21b4667d0d8992e610c90"
+    },
+    "raisedBy": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "description": "Product arrived with minor scratches",
+    "status": "under_review",
+    "resolution": null,
+    "createdAt": {
+      "$date": "2023-06-28T13:20:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2023-06-29T09:10:00.000Z"
+    }
   },
-  "orderItemId": {
-    "$oid": "60d21b4667d0d8992e610c90"
+  {
+    "_id": {
+      "$oid": "6880150405b3541d947dcfe0"
+    },
+    "orderItemId": {
+      "$oid": "68800e8112519642912aeef2"
+    },
+    "raisedBy": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "description": "lỗi",
+    "status": "open",
+    "createdAt": {
+      "$date": "2025-07-22T22:47:32.088Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-22T22:47:32.088Z"
+    },
+    "__v": 0
   },
-  "raisedBy": {
-    "$oid": "60d21b4667d0d8992e610c88"
+  {
+    "_id": {
+      "$oid": "68805601b2338f453606df24"
+    },
+    "orderItemId": {
+      "$oid": "688051f3b2338f453606b962"
+    },
+    "raisedBy": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "description": "hàng lỗi",
+    "status": "under_review",
+    "createdAt": {
+      "$date": "2025-07-23T03:24:49.860Z"
+    },
+    "updatedAt": {
+      "$date": "2025-07-23T03:25:41.762Z"
+    },
+    "__v": 0,
+    "resolution": "trả hàng"
   },
-  "description": "Product arrived with minor scratches",
-  "status": "under_review",
-  "resolution": null,
-  "createdAt": {
-    "$date": "2023-06-28T13:20:00.000Z"
+  {
+    "_id": {
+      "$oid": "688900000000000000000017"
+    },
+    "orderItemId": {
+      "$oid": "688900000000000000000006"
+    },
+    "raisedBy": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "description": "Seed dispute for validation",
+    "status": "open",
+    "resolution": null,
+    "createdAt": {
+      "$date": "2026-07-23T08:25:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T08:25:00.000Z"
+    }
   },
-  "updatedAt": {
-    "$date": "2023-06-29T09:10:00.000Z"
+  {
+    "_id": {
+      "$oid": "068900000000000000000070"
+    },
+    "orderItemId": {
+      "$oid": "60d21b4667d0d8992e610ca6"
+    },
+    "raisedBy": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "description": "Seed dispute 1",
+    "status": "open",
+    "resolution": null,
+    "createdAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000071"
+    },
+    "orderItemId": {
+      "$oid": "6877e0ac5216b9c2e3473721"
+    },
+    "raisedBy": {
+      "$oid": "60d21b4667d0d8992e610c89"
+    },
+    "description": "Seed dispute 2",
+    "status": "under_review",
+    "resolution": null,
+    "createdAt": {
+      "$date": "2026-07-23T17:40:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T17:40:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000072"
+    },
+    "orderItemId": {
+      "$oid": "6877e1665216b9c2e347382a"
+    },
+    "raisedBy": {
+      "$oid": "60d21b4667d0d8992e610c8a"
+    },
+    "description": "Seed dispute 3",
+    "status": "open",
+    "resolution": null,
+    "createdAt": {
+      "$date": "2026-07-23T18:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T18:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000073"
+    },
+    "orderItemId": {
+      "$oid": "6877e4020bd063264e9e277c"
+    },
+    "raisedBy": {
+      "$oid": "690c7fdaaa95f07461f075b7"
+    },
+    "description": "Seed dispute 4",
+    "status": "under_review",
+    "resolution": null,
+    "createdAt": {
+      "$date": "2026-07-23T18:40:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T18:40:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000074"
+    },
+    "orderItemId": {
+      "$oid": "6877f5790bd063264e9e2aab"
+    },
+    "raisedBy": {
+      "$oid": "688900000000000000000001"
+    },
+    "description": "Seed dispute 5",
+    "status": "open",
+    "resolution": null,
+    "createdAt": {
+      "$date": "2026-07-23T19:10:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T19:10:19.028Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "068900000000000000000075"
+    },
+    "orderItemId": {
+      "$oid": "6878748f123a66598d7a56df"
+    },
+    "raisedBy": {
+      "$oid": "60d21b4667d0d8992e610c88"
+    },
+    "description": "Seed dispute 6",
+    "status": "under_review",
+    "resolution": null,
+    "createdAt": {
+      "$date": "2026-07-23T19:40:19.028Z"
+    },
+    "updatedAt": {
+      "$date": "2026-07-23T19:40:19.028Z"
+    }
   }
-},
-{
-  "_id": {
-    "$oid": "6880150405b3541d947dcfe0"
-  },
-  "orderItemId": {
-    "$oid": "68800e8112519642912aeef2"
-  },
-  "raisedBy": {
-    "$oid": "60d21b4667d0d8992e610c88"
-  },
-  "description": "lỗi",
-  "status": "open",
-  "createdAt": {
-    "$date": "2025-07-22T22:47:32.088Z"
-  },
-  "updatedAt": {
-    "$date": "2025-07-22T22:47:32.088Z"
-  },
-  "__v": 0
-},
-{
-  "_id": {
-    "$oid": "68805601b2338f453606df24"
-  },
-  "orderItemId": {
-    "$oid": "688051f3b2338f453606b962"
-  },
-  "raisedBy": {
-    "$oid": "60d21b4667d0d8992e610c88"
-  },
-  "description": "hàng lỗi",
-  "status": "under_review",
-  "createdAt": {
-    "$date": "2025-07-23T03:24:49.860Z"
-  },
-  "updatedAt": {
-    "$date": "2025-07-23T03:25:41.762Z"
-  },
-  "__v": 0,
-  "resolution": "trả hàng"
-}]
+]

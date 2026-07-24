@@ -83,7 +83,7 @@ const StoreRegistration = () => {
             Register as Seller
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Set up your store and start selling on Shopii
+            Set up your store and start selling on Aba
           </p>
         </div>
         

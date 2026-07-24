@@ -32,6 +32,7 @@ const SignIn = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [twoFARequired, setTwoFARequired] = useState(false);
   const [tempToken, setTempToken] = useState('');
   const [twoFACode, setTwoFACode] = useState('');
@@ -40,12 +41,14 @@ const SignIn = () => {
   // Handle input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (errorMessage) setErrorMessage('');
   };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage('');
 
     try {
       const response = await login({
@@ -124,7 +127,9 @@ const SignIn = () => {
         return;
       }
 
-      toast.error(error.response?.data?.message || error.message || 'Login failed');
+      const backendMsg = error.response?.data?.message || error.response?.data?.error || error.message || 'Login failed';
+      setErrorMessage(backendMsg);
+      toast.error(backendMsg);
     } finally {
       setIsLoading(false);
     }
@@ -134,6 +139,7 @@ const SignIn = () => {
     e.preventDefault();
     if (!twoFACode) return;
     setIsLoading(true);
+    setErrorMessage('');
     try {
       const result = await verifyAdmin2FA(tempToken, twoFACode, trustDevice);
       // After verification, we need the user info; a simple way is to navigate and let app fetch profile
@@ -141,7 +147,9 @@ const SignIn = () => {
       toast.success('2FA verified');
       navigate('/admin');
     } catch (err) {
-      toast.error(err.message || '2FA verification failed');
+      const backendMsg = err.response?.data?.message || err.response?.data?.error || err.message || '2FA verification failed';
+      setErrorMessage(backendMsg);
+      toast.error(backendMsg);
     } finally {
       setIsLoading(false);
     }
@@ -165,6 +173,23 @@ const SignIn = () => {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={twoFARequired ? handleVerify2FA : handleSubmit}>
+          {errorMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 shadow-sm"
+              role="alert"
+            >
+              <svg className="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="flex-1">
+                <span className="font-semibold block mb-0.5">Error</span>
+                <p className="text-red-600">{errorMessage}</p>
+              </div>
+            </motion.div>
+          )}
+
           <div className="rounded-md shadow-sm space-y-4">
             {/* Email Input */}
             <div>

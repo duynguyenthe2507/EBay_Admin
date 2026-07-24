@@ -31,6 +31,9 @@ import {
   Card,
   CardContent,
   Rating,
+  Select,
+  MenuItem,
+  FormControl,
 } from "@mui/material";
 import axios from "axios";
 import UpdateStore from "./UpdateStore";
@@ -40,7 +43,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
-export default function Stores({ stores: initialStores, onStoreUpdated, isMonitor = false }) {
+const ALL_STATUSES = ["pending", "approved", "rejected"];
+
+export default function Stores({ stores: initialStores, onStoreUpdated, isMonitor = false, userRole }) {
+  const canChangeStatus = ["admin", "support"].includes(userRole);
+  const [stores, setStores] = React.useState(initialStores);
   const [deletingStore, setDeletingStore] = React.useState(null);
   const [editingStore, setEditingStore] = React.useState(null);
   const [snackbar, setSnackbar] = React.useState({
@@ -52,6 +59,46 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
   const [selectedStatuses, setSelectedStatuses] = React.useState([]);
   const [selectedRatingRanges, setSelectedRatingRanges] = React.useState([]);
   const [currentPage, setCurrentPage] = React.useState(1);
+
+  // Sync local stores when the parent provides a fresh list
+  React.useEffect(() => {
+    setStores(initialStores);
+  }, [initialStores]);
+
+  // Handle inline status change for admin/support
+  const handleStoreStatusChange = async (storeId, newStatus) => {
+    // Optimistic update — reflect change in UI immediately
+    const previousStores = stores;
+    setStores((prev) =>
+      prev.map((s) => (s._id === storeId ? { ...s, status: newStatus } : s))
+    );
+    try {
+      await axios.put(
+        `http://localhost:9999/api/admin/stores/${storeId}/status`,
+        { status: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken") || ""}`,
+          },
+        }
+      );
+      setSnackbar({
+        open: true,
+        msg: `Store status updated to "${newStatus}" successfully!`,
+        severity: "success",
+      });
+      // Trigger background re-fetch so parent data stays in sync
+      onStoreUpdated(currentPage);
+    } catch (error) {
+      // Roll back on failure
+      setStores(previousStores);
+      setSnackbar({
+        open: true,
+        msg: error?.response?.data?.message || "Failed to update store status!",
+        severity: "error",
+      });
+    }
+  };
 
   const handleDeleteStore = async () => {
     if (!deletingStore) return;
@@ -90,14 +137,8 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
     }
   };
 
-  // Compute unique statuses from stores
-  const statuses = React.useMemo(() => {
-    const statusSet = new Set();
-    initialStores.forEach((store) => {
-      if (store.status) statusSet.add(store.status);
-    });
-    return Array.from(statusSet);
-  }, [initialStores]);
+  // Fixed statuses for filter
+  const statuses = ALL_STATUSES;
 
   // Define rating ranges
   const ratingRanges = [
@@ -109,7 +150,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
 
   // Filter stores based on search, statuses, and rating ranges
   const filteredStores = React.useMemo(() => {
-    let filtered = [...initialStores];
+    let filtered = [...stores];
 
     // 1. Filter by search (storeName or seller username/email)
     if (keywords.trim() !== "") {
@@ -144,7 +185,7 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
     }
 
     return filtered;
-  }, [initialStores, keywords, selectedStatuses, selectedRatingRanges]);
+  }, [stores, keywords, selectedStatuses, selectedRatingRanges]);
 
   const STORES_PER_PAGE = 10;
   const totalFilteredPages = Math.ceil(filteredStores.length / STORES_PER_PAGE);
@@ -179,11 +220,11 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
   // Function to get status color
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
-      case "active":
+      case "approved":
         return "#4caf50";
       case "pending":
         return "#ff9800";
-      case "suspended":
+      case "rejected":
         return "#f44336";
       default:
         return "#757575";
@@ -509,16 +550,46 @@ export default function Stores({ stores: initialStores, onStoreUpdated, isMonito
                       <TableCell>{store.sellerId?.username || "N/A"}</TableCell>
                       <TableCell>{store.sellerId?.email}</TableCell>
                       <TableCell>
-                        <Chip
-                          label={store.status}
-                          size="small"
-                          sx={{
-                            bgcolor: `${getStatusColor(store.status)}20`,
-                            color: getStatusColor(store.status),
-                            fontWeight: 500,
-                            borderRadius: 1
-                          }}
-                        />
+                        {canChangeStatus ? (
+                          <FormControl size="small" variant="outlined">
+                            <Select
+                              value={store.status}
+                              onChange={(e) => handleStoreStatusChange(store._id, e.target.value)}
+                              sx={{
+                                minWidth: 120,
+                                borderRadius: 1.5,
+                                fontSize: "0.8rem",
+                                fontWeight: 600,
+                                color: getStatusColor(store.status),
+                                bgcolor: `${getStatusColor(store.status)}15`,
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                  borderColor: `${getStatusColor(store.status)}60`,
+                                },
+                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                  borderColor: getStatusColor(store.status),
+                                },
+                                '& .MuiSvgIcon-root': {
+                                  color: getStatusColor(store.status),
+                                },
+                              }}
+                            >
+                              <MenuItem value="pending" sx={{ color: '#ff9800', fontWeight: 500 }}>Pending</MenuItem>
+                              <MenuItem value="approved" sx={{ color: '#4caf50', fontWeight: 500 }}>Approved</MenuItem>
+                              <MenuItem value="rejected" sx={{ color: '#f44336', fontWeight: 500 }}>Rejected</MenuItem>
+                            </Select>
+                          </FormControl>
+                        ) : (
+                          <Chip
+                            label={store.status}
+                            size="small"
+                            sx={{
+                              bgcolor: `${getStatusColor(store.status)}20`,
+                              color: getStatusColor(store.status),
+                              fontWeight: 500,
+                              borderRadius: 1
+                            }}
+                          />
+                        )}
                       </TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>

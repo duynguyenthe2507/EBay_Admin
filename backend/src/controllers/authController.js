@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const logger = require("../utils/logger");
 const { sendEmail } = require("../services/emailService");
+const { createAuditLog } = require("../services/auditLogService");
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
 
@@ -65,7 +66,7 @@ exports.register = async (req, res) => {
 
     // Gửi email chào mừng
     try {
-      await sendEmail(user.email, "Welcome to Shopii", "Thank you for registering with us!");
+      await sendEmail(user.email, "Welcome to Aba", "Thank you for registering with us!");
     } catch (emailError) {
       logger.error("Failed to send welcome email:", emailError);
     }
@@ -90,12 +91,30 @@ exports.login = async (req, res) => {
     // Tìm người dùng theo email
     const user = await User.findOne({ email });
     if (!user) {
+      await createAuditLog({
+        adminEmail: email,
+        adminName: email,
+        action: "LOGIN_FAILED",
+        targetType: "User",
+        description: `Failed login attempt for ${email}`,
+        status: "FAILED"
+      }, req);
       return res.status(400).json({ success: false, message: "Thông tin đăng nhập không hợp lệ" });
     }
 
     // Kiểm tra mật khẩu
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+      await createAuditLog({
+        admin: user._id,
+        adminEmail: user.email,
+        adminName: user.username || user.email,
+        action: "LOGIN_FAILED",
+        targetType: "User",
+        targetId: user._id,
+        description: `Failed login attempt for ${user.email}`,
+        status: "FAILED"
+      }, req);
       return res.status(400).json({ success: false, message: "Thông tin đăng nhập không hợp lệ" });
     }
 
@@ -173,6 +192,17 @@ exports.login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
+
+    await createAuditLog({
+      admin: user._id,
+      adminEmail: user.email,
+      adminName: user.username || user.email,
+      action: "LOGIN_SUCCESS",
+      targetType: "User",
+      targetId: user._id,
+      description: `Logged in successfully as ${user.email}`,
+      status: "SUCCESS"
+    }, req);
 
     res.json({
       success: true,
@@ -314,7 +344,7 @@ exports.setupAdmin2FA = async (req, res) => {
     if (!user || user.role !== 'admin') {
       return res.status(403).json({ success: false, message: 'Only admin can setup 2FA' });
     }
-    const secret = speakeasy.generateSecret({ name: `Shopii Admin (${user.email})` });
+    const secret = speakeasy.generateSecret({ name: `Aba Admin (${user.email})` });
     user.twoFASecret = secret.base32;
     user.twoFAEnabled = true;
     await user.save();
@@ -461,6 +491,17 @@ exports.updatePassword = async (req, res) => {
     // Update password
     user.password = newPassword; // Will be hashed by the pre-save hook
     await user.save();
+
+    await createAuditLog({
+      admin: user._id,
+      adminEmail: user.email,
+      adminName: user.username || user.email,
+      action: "PASSWORD_CHANGE",
+      targetType: "User",
+      targetId: user._id,
+      description: `Changed password for ${user.email}`,
+      status: "SUCCESS"
+    }, req);
 
     res.json({
       success: true,

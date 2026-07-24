@@ -235,7 +235,7 @@ export default function LockedAccount() {
 
         <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid #e0e0e0' }}>
           <Typography variant="body2" color="text.secondary">
-            Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email: support@shopii.com
+            Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email: support@aba.com
           </Typography>
         </Box>
       </Paper>

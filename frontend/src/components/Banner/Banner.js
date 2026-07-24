@@ -55,7 +55,7 @@ const CustomSlide = ({ Subtext, imgSrc, text, buttonLink, buttonText }) => (
               textTransform: "uppercase",
             }}
           >
-            Shopii Store
+            Aba Store
           </Typography>
           <Typography
             variant="h2"

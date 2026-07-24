@@ -4,10 +4,13 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Stores from "./Stores";
 import { useOutletContext } from "react-router-dom";
+import { useSelector } from "react-redux";
 import axios from "axios";
 
 export default function ManageStore() {
   const { handleSetDashboardTitle, isMonitor } = useOutletContext();
+  const auth = useSelector((state) => state.auth);
+  const userRole = auth?.user?.role;
   const [stores, setStores] = React.useState([]);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [totalPages, setTotalPages] = React.useState(1);
@@ -56,6 +59,7 @@ export default function ManageStore() {
             currentPage={currentPage}
             totalPages={totalPages}
             isMonitor={isMonitor}
+            userRole={userRole}
             onPageChange={handlePageChange}
           />
         </Paper>
